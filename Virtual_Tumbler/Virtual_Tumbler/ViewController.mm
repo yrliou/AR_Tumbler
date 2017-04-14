@@ -29,8 +29,8 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    Boolean VideoStream = true;
-    //Boolean VideoStream = false;
+    //Boolean VideoStream = true;
+    Boolean VideoStream = false;
     [self VideoStillImage:VideoStream];
 }
 
@@ -58,9 +58,9 @@
         UIImage *image_test_3cards_dark = [UIImage imageNamed:@"image_test_3cards_dark.jpg"];
         if(image_test_many == nil) std::cout << "Cannot read in the file image_test_3cards_dark.jpg!!" << std::endl;
         
-        //UIImage *inputImage = image_test_3cards;
+        UIImage *inputImage = image_test_3cards;
         //UIImage *inputImage = image_test_3cards_dark;
-        UIImage *inputImage = image_test_1card;
+        //UIImage *inputImage = image_test_1card;
         
         // set the ImageView_ for still image
         [self showImage:inputImage];
