@@ -29,8 +29,8 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    //Boolean VideoStream = true;
-    Boolean VideoStream = false;
+    Boolean VideoStream = true;
+    //Boolean VideoStream = false;
     [self VideoStillImage:VideoStream];
 }
 
