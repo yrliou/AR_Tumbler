@@ -29,8 +29,8 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    Boolean VideoStream = true;
-    //Boolean VideoStream = false;
+    //Boolean VideoStream = true;
+    Boolean VideoStream = false;
     [self VideoStillImage:VideoStream];
 }
 
@@ -54,11 +54,21 @@
         UIImage *image_test_many = [UIImage imageNamed:@"image_test_many.jpg"];
         if(image_test_many == nil) std::cout << "Cannot read in the file image_test_many.jpg!!" << std::endl;
         
+        // read image_3cards_half
+        UIImage *image_3cards_half = [UIImage imageNamed:@"3cards_half.jpg"];
+        if(image_3cards_half == nil) std::cout << "Cannot read in the file 3cards_half.jpg!!" << std::endl;
+        
+        // read image_3cards_hand
+        UIImage *image_3cards_hand = [UIImage imageNamed:@"3cards_with_hand.jpg"];
+        if(image_3cards_hand == nil) std::cout << "Cannot read in the file 3cards_with_hand.jpg!!" << std::endl;
+        
         // read image_test_many image
         UIImage *image_test_3cards_dark = [UIImage imageNamed:@"image_test_3cards_dark.jpg"];
         if(image_test_many == nil) std::cout << "Cannot read in the file image_test_3cards_dark.jpg!!" << std::endl;
         
-        UIImage *inputImage = image_test_3cards;
+        UIImage *inputImage = image_3cards_hand;
+        //UIImage *inputImage = image_3cards_half;
+        //UIImage *inputImage = image_test_3cards;
         //UIImage *inputImage = image_test_3cards_dark;
         //UIImage *inputImage = image_test_1card;
         

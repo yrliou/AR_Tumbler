@@ -27,6 +27,8 @@
 		221F36F61E991F440036F3C1 /* image_test_3cards_dark.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 221F36F51E991F440036F3C1 /* image_test_3cards_dark.jpg */; };
 		221F37761E9949110036F3C1 /* HSV_filter.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 221F37751E9949110036F3C1 /* HSV_filter.fsh */; };
 		22791DE21E9AB08B0004EF97 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22791DE11E9AB08B0004EF97 /* AssetsLibrary.framework */; };
+		22A2366B1EA5BEE3002CEB16 /* 3cards_half.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22A236691EA5BEE3002CEB16 /* 3cards_half.jpg */; };
+		22A2366C1EA5BEE3002CEB16 /* 3cards_with_hand.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22A2366A1EA5BEE3002CEB16 /* 3cards_with_hand.jpg */; };
 		22AF555A1EA07B0800545402 /* armadillo in Resources */ = {isa = PBXBuildFile; fileRef = 22AF55581EA07B0800545402 /* armadillo */; };
 		22AF555B1EA07B0800545402 /* armadillo_bits in Resources */ = {isa = PBXBuildFile; fileRef = 22AF55591EA07B0800545402 /* armadillo_bits */; };
 		22AF555D1EA0800100545402 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22AF555C1EA0800100545402 /* CoreMedia.framework */; };
@@ -79,6 +81,8 @@
 		221F36F51E991F440036F3C1 /* image_test_3cards_dark.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = image_test_3cards_dark.jpg; sourceTree = "<group>"; };
 		221F37751E9949110036F3C1 /* HSV_filter.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = HSV_filter.fsh; sourceTree = "<group>"; };
 		22791DE11E9AB08B0004EF97 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
+		22A236691EA5BEE3002CEB16 /* 3cards_half.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 3cards_half.jpg; sourceTree = "<group>"; };
+		22A2366A1EA5BEE3002CEB16 /* 3cards_with_hand.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 3cards_with_hand.jpg; sourceTree = "<group>"; };
 		22AF55581EA07B0800545402 /* armadillo */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = armadillo; sourceTree = "<group>"; };
 		22AF55591EA07B0800545402 /* armadillo_bits */ = {isa = PBXFileReference; lastKnownFileType = folder; path = armadillo_bits; sourceTree = "<group>"; };
 		22AF555C1EA0800100545402 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
@@ -163,6 +167,8 @@
 		221F36A31E9834500036F3C1 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				22A236691EA5BEE3002CEB16 /* 3cards_half.jpg */,
+				22A2366A1EA5BEE3002CEB16 /* 3cards_with_hand.jpg */,
 				221F37751E9949110036F3C1 /* HSV_filter.fsh */,
 				221F36F51E991F440036F3C1 /* image_test_3cards_dark.jpg */,
 				221F36EF1E991DE80036F3C1 /* image_test_1card.jpg */,
@@ -318,6 +324,8 @@
 				221F36B31E9834500036F3C1 /* LaunchScreen.storyboard in Resources */,
 				221F36B01E9834500036F3C1 /* Assets.xcassets in Resources */,
 				221F36F31E991DE80036F3C1 /* image_test_3cards.jpg in Resources */,
+				22A2366B1EA5BEE3002CEB16 /* 3cards_half.jpg in Resources */,
+				22A2366C1EA5BEE3002CEB16 /* 3cards_with_hand.jpg in Resources */,
 				221F37761E9949110036F3C1 /* HSV_filter.fsh in Resources */,
 				22AF555A1EA07B0800545402 /* armadillo in Resources */,
 				221F36AE1E9834500036F3C1 /* Main.storyboard in Resources */,
