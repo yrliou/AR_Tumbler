@@ -74,6 +74,14 @@ cv::vector<cv::vector<cv::Point>> cardRecognition(cv::Mat &image){
     //************     Get four corners of cards
     cv::vector<cv::vector<cv::Point>> card_corners;
     
+    //Approach with approxPolyDP
+    card_corners = getQuadpointApprox(card_contours);
+    
+    //***********      rescale back the points
+    rescalePoints(card_corners, RESIZE_SCALE);
+    
+    
+    
     // Using HoughlineP
     // 1. transform card_contours to mat
     // 2. get lines from HoughlineP (will try probabilistic Hough transform)
@@ -81,23 +89,7 @@ cv::vector<cv::vector<cv::Point>> cardRecognition(cv::Mat &image){
     //card_points = getQuadpoint(card_contours, resizeImage, RESIZE_SCALE, image);
     //plotCircle(image, RESIZE_SCALE, card_contours);
     
-    
-    //Approach with approxPolyDP
-    card_corners = getQuadpointApprox(card_contours);
-    /*
-    cv::vector<cv::Point> approx;
-    for(int i = 0; i < card_contours.size(); i++){
-        float epsilon = 0.05 * cv::arcLength(card_contours[i], true);
-        cv::approxPolyDP(card_contours[i], approx, epsilon, true);
-        std::cout << " card_corners index " << i << " has " << approx.size() << std::endl;
-        
-        if(approx.size() == 4){
-            card_corners.push_back(approx);
-        }
-    }
-     */
-    
-    plotCircle(image, RESIZE_SCALE, card_corners);
+    //plotCircle(image, RESIZE_SCALE, card_corners);
     
     /*
     // draw contour
@@ -129,6 +121,18 @@ cv::vector<cv::vector<cv::Point>> cardRecognition(cv::Mat &image){
     return card_corners;
 }
 
+void rescalePoints(cv::vector<cv::vector<cv::Point>> &card_corners, float RESIZE_SCALE){
+    
+    
+    for( int i = 0; i< card_corners.size(); i++ ){
+        
+        for(int j = 0; j < card_corners[i].size(); j++){
+            card_corners[i][j].x = card_corners[i][j].x / RESIZE_SCALE;
+            card_corners[i][j].y = card_corners[i][j].y / RESIZE_SCALE;
+        }
+    }
+}
+
 cv::vector<cv::vector<cv::Point>> getQuadpointApprox(cv::vector<cv::vector<cv::Point>> &card_contours){
     cv::vector<cv::Point> approx;
     cv::vector<cv::vector<cv::Point>> card_corners;
@@ -136,7 +140,7 @@ cv::vector<cv::vector<cv::Point>> getQuadpointApprox(cv::vector<cv::vector<cv::P
     for(int i = 0; i < card_contours.size(); i++){
         float epsilon = 0.05 * cv::arcLength(card_contours[i], true);
         cv::approxPolyDP(card_contours[i], approx, epsilon, true);
-        std::cout << " card_corners index " << i << " has " << approx.size() << std::endl;
+        //std::cout << " card_corners index " << i << " has " << approx.size() << std::endl;
         
         if(approx.size() == 4){
             card_corners.push_back(approx);
@@ -291,8 +295,8 @@ cv::vector<cv::vector<cv::Point>> removeFalseContour(cv::vector<cv::vector<cv::P
         }
     }
     
-    std::cout << "return removeFalseContour" << std::endl;
-    printContourArea(card_contours);
+    //std::cout << "return removeFalseContour" << std::endl;
+    //printContourArea(card_contours);
     return card_contours;
 }
 

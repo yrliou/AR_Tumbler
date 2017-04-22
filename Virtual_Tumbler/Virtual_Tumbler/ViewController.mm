@@ -11,15 +11,20 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include "cardRecognition.h"
+#include "cardTracking.h"
 
 
 @interface ViewController (){
     UIImageView *imageView_;
     UITextView *fpsView_;
     int64 curr_time_;
-    
     int card_recognition;
     cv::vector<cv::vector<cv::Point>> card_corners;
+    
+    cv::Mat prevImage;
+    cv::vector<cv::Point2f> prefeaturesCorners;
+    
+    float RESCALE;
 }
 
 @end
@@ -31,9 +36,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
     Boolean VideoStream = true;
     //Boolean VideoStream = false;
+    
+    RESCALE = 0.5;
+    
     [self VideoStillImage:VideoStream];
 }
 
@@ -89,8 +96,14 @@
         cv::cvtColor(cvImage, processImage, CV_RGBA2BGR);
         
         // process image
+        cv::vector<cv::vector<cv::Point>> card_corners;
+        card_corners = cardRecognition(processImage);
         
-        cardRecognition(processImage);
+        
+        
+        [self plotCircle:processImage points:card_corners];
+        cv::cvtColor(processImage, processImage, CV_BGR2RGBA);
+        
         
         // show on the screen
         imageView_.image = [self UIImageFromCVMat:processImage];
@@ -108,13 +121,45 @@
 // Function to run apply image on
 - (void) processImage:(cv::Mat &)image
 {
+    
+    //card_corners = cardRecognition(image);
+    //[self plotCircle:image points:card_corners];
+    
+    if(card_recognition == 0){
+        card_corners = cardRecognition(image);
+        prevImage = image.clone();
+        featureTrack(image, prefeaturesCorners, RESCALE);
+        
+        [self plotCircle:image points:card_corners];
+    }
+    else{
+        cardTracking(card_corners, image, prevImage, prefeaturesCorners);
+        
+        [self plotCircle:image points:card_corners];
+    }
+    
     // show FPS
-    
-    card_corners = cardRecognition(image);
-    
     [self showFPS];
 }
 
+
+- (void) plotCircle:(cv::Mat &)image points:(cv::vector<cv::vector<cv::Point>>) contours{
+    
+    cv::Scalar color = cv::Scalar(0,0,255);
+    
+    cv::vector<cv::Point> contour_;
+    for( int i = 0; i< contours.size(); i++ ){
+        //std::cout << "contour size is " << contours[i].size() << " index is " << i << std::endl;
+        contour_ = contours[i];
+        cv::Scalar color = cv::Scalar(0,0,255);
+        
+        for(int j = 0; j < contour_.size(); j++){
+            //image, center of circle, radius, clolr, thickness
+            cv::circle(image, contour_[j], 10, color, 5, 10, 0);
+        }
+        //cv::drawContours( image, contours, i, color, 1, 8);
+    }
+}
 
 // setup camera and put fps
 - (void) cameraSetup {

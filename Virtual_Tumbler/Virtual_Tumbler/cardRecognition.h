@@ -20,4 +20,6 @@ cv::vector<cv::vector<cv::Point>> getQuadpointHough(cv::vector<cv::vector<cv::Po
 
 cv::vector<cv::vector<cv::Point>> getQuadpointApprox(cv::vector<cv::vector<cv::Point>> &card_contours);
 
+void rescalePoints(cv::vector<cv::vector<cv::Point>> &card_corners, float RESIZE_SCALE);
+
 #endif /* defined(__Virtual_Tumbler_cardRecognition__) */
