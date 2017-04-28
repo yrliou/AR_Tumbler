@@ -1,5 +1,5 @@
 #ifndef __Virtual_Tumbler_cardTracking__
-#define __Virtual_Tumbler_cardRTracking__
+#define __Virtual_Tumbler_cardTracking__
 
 //#include <stdio.h>
 #include <iostream>
@@ -8,7 +8,13 @@
 #include "opencv2/nonfree/features2d.hpp"
 #include <opencv2/opencv.hpp>
 
-void cardTracking(cv::vector<cv::vector<cv::Point>> &card_corners, cv::Mat &image, cv::Mat &prevImage, cv::vector<cv::Point2f> &prefeaturesCorners);
-void featureTrack(cv::Mat &image, cv::vector<cv::Point2f> &featuresCorners, float RESCALE);
+void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv::vector<cv::Point>> &card_corners, float TRACK_RESCALE, cv::Ptr<cv::DescriptorExtractor> Extractor_, cv::Ptr<cv::FeatureDetector> Detector_);
+
+void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv::vector<cv::Point>> &card_corners, float TRACK_RESCALE, cv::BRISK *brisk_detector_);
+
+void trackingCorner(cv::Mat &grayImage, cv::vector<cv::vector<cv::Point>> &card_corners, cv::Mat &image, float TRACK_RESCALE);
+
+void cardTrackingOpticalFlow(cv::vector<cv::vector<cv::Point>> &card_corners, cv::Mat &image, cv::Mat &prevImage, cv::vector<cv::Point2f> &prefeaturesCorners);
+void featureTrack(cv::Mat &grayImage, cv::vector<cv::Point2f> &featuresCorners);
 
 #endif /* defined(__Virtual_Tumbler_cardRTracking__) */

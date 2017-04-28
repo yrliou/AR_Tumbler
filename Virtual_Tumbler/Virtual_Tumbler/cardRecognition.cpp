@@ -9,6 +9,7 @@ cv::vector<cv::vector<cv::Point>> cardRecognition(cv::Mat &image){
     
     // resize image
     cv::Mat resizeImage = image.clone(); // deep copy to resizeImage
+    cv::GaussianBlur(resizeImage, resizeImage, cv::Size(5,5), 1.2, 1.2);
     cv::resize(resizeImage, resizeImage, cv::Size(), RESIZE_SCALE, RESIZE_SCALE);
 
     cv::Mat display_image;

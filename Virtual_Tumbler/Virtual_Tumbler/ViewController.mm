@@ -22,9 +22,16 @@
     cv::vector<cv::vector<cv::Point>> card_corners;
     
     cv::Mat prevImage;
-    cv::vector<cv::Point2f> prefeaturesCorners;
+    //cv::vector<cv::Point2f> prefeaturesCorners;
+    float TRACK_RESCALE;
     
-    float RESCALE;
+    // SURF is too slow
+    //cv::SurfFeatureDetector *surfDetector;
+    //cv::SurfDescriptorExtractor *surfExtractor;
+    //cv::Ptr<cv::FeatureDetector> Detector_;
+    //cv::Ptr<cv::DescriptorExtractor> Extractor_;
+    cv::BRISK *brisk_detector_;
+    
 }
 
 @end
@@ -39,7 +46,16 @@
     Boolean VideoStream = true;
     //Boolean VideoStream = false;
     
-    RESCALE = 0.5;
+    TRACK_RESCALE = 0.60;
+    
+    //int minHessian = 800;
+    //surfDetector = new cv::SurfFeatureDetector(minHessian); // set the detector
+    //surfExtractor = new cv::SurfDescriptorExtractor(); // Set the extractor
+    int thresh = 30;
+    int octaves = 3;
+    float patternSacle = 1.0f;
+    brisk_detector_ = new cv::BRISK(thresh, octaves, patternSacle);
+    
     
     [self VideoStillImage:VideoStream];
 }
@@ -81,12 +97,12 @@
         UIImage *image_test_3cards_dark = [UIImage imageNamed:@"image_test_3cards_dark.jpg"];
         if(image_test_many == nil) std::cout << "Cannot read in the file image_test_3cards_dark.jpg!!" << std::endl;
         
-        UIImage *inputImage = image_4cards;
+        //UIImage *inputImage = image_4cards;
         //UIImage *inputImage = image_3cards_hand;
         //UIImage *inputImage = image_3cards_half;
         //UIImage *inputImage = image_test_3cards;
         //UIImage *inputImage = image_test_3cards_dark;
-        //UIImage *inputImage = image_test_1card;
+        UIImage *inputImage = image_test_1card;
         
         // set the ImageView_ for still image
         [self showImage:inputImage];
@@ -99,7 +115,8 @@
         cv::vector<cv::vector<cv::Point>> card_corners;
         card_corners = cardRecognition(processImage);
         
-        
+        // Test fillpoly to get a mask
+        cv::fillConvexPoly(processImage, card_corners[0], cv::Scalar(0,255,0));
         
         [self plotCircle:processImage points:card_corners];
         cv::cvtColor(processImage, processImage, CV_BGR2RGBA);
@@ -122,22 +139,45 @@
 - (void) processImage:(cv::Mat &)image
 {
     
-    //card_corners = cardRecognition(image);
-    //[self plotCircle:image points:card_corners];
+    card_corners = cardRecognition(image);
+    [self plotCircle:image points:card_corners];
     
-    if(card_recognition == 0){
+    
+    /*
+    // blur image before downsampling
+    cv::Mat grayImage;
+    cv::Mat resizeImage;
+    cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY);
+    cv::GaussianBlur(grayImage, resizeImage, cv::Size(5,5), 1.0, 1.0);
+    cv::resize(resizeImage, grayImage, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
+    //cv::cvtColor(resizeImage, grayImage, cv::COLOR_BGR2GRAY);
+    
+    
+    if(card_recognition < 60){
         card_corners = cardRecognition(image);
-        prevImage = image.clone();
-        featureTrack(image, prefeaturesCorners, RESCALE);
+        prevImage = grayImage.clone();
         
+        //featureTrack(grayImage, prefeaturesCorners);
+        
+        //plot circle
         [self plotCircle:image points:card_corners];
+        
+        card_recognition += 1;
     }
     else{
-        cardTracking(card_corners, image, prevImage, prefeaturesCorners);
+        // not yet finish can move card independently
+        //cardTracking(card_corners, grayImage, prevImage, prefeaturesCorners);
         
+        // card can't move independently, only move camera
+        cardAllFindhomography(prevImage, grayImage, card_corners, TRACK_RESCALE, brisk_detector_);
+        //cardAllFindhomography(prevImage, grayImage, card_corners, TRACK_RESCALE, surfExtractor, surfDetector);
+        
+        trackingCorner(grayImage, card_corners, image, TRACK_RESCALE);
+        
+        prevImage = grayImage.clone();
         [self plotCircle:image points:card_corners];
     }
-    
+    */
     // show FPS
     [self showFPS];
 }
@@ -165,8 +205,8 @@
 - (void) cameraSetup {
     
     
-    //float cam_width = 480; float cam_height = 640;
-    float cam_width = 720; float cam_height = 1280;
+    float cam_width = 480; float cam_height = 640;
+    //float cam_width = 720; float cam_height = 1280;
     
     // setup frame size
     int view_width = self.view.frame.size.width;
