@@ -12,7 +12,7 @@ void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv
 
 void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv::vector<cv::Point>> &card_corners, float TRACK_RESCALE, cv::BRISK *brisk_detector_);
 
-void trackingCorner(cv::Mat &grayImage, cv::vector<cv::vector<cv::Point>> &card_corners, cv::Mat &image, float TRACK_RESCALE);
+void trackingCorner(cv::Mat &colorImage, cv::vector<cv::vector<cv::Point>> &card_corners, cv::Mat &image, float TRACK_RESCALE);
 
 cv::vector<cv::Point> getQuadpointOneCard(cv::vector<cv::vector<cv::Point>> &one_card_contours);
 

@@ -106,16 +106,19 @@ void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv
     
 }
 
-void trackingCorner(cv::Mat &grayImage, cv::vector<cv::vector<cv::Point>> &card_corners, cv::Mat &image, float TRACK_RESCALE){
+void trackingCorner(cv::Mat &colorImage, cv::vector<cv::vector<cv::Point>> &card_corners, cv::Mat &image, float TRACK_RESCALE){
     
     //***************** keep only yellow range
     cv::Mat gray_image;
     cv::Mat yellow_mask;
-    cv::Mat hsv_image = image.clone();
-    cv::GaussianBlur(hsv_image, gray_image, cv::Size(5,5), 1.2, 1.2);
-    cv::resize(gray_image, gray_image, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
+    cv::Mat grayImage;
+    cv::Mat hsv_image;
+    //cv::GaussianBlur(hsv_image, gray_image, cv::Size(5,5), 1.2, 1.2);
+    //cv::resize(gray_image, gray_image, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
+    cv::cvtColor(colorImage, grayImage, cv::COLOR_BGR2GRAY);
     
-    cv::cvtColor(gray_image, hsv_image, cv::COLOR_BGR2HSV);
+    
+    cv::cvtColor(colorImage, hsv_image, cv::COLOR_BGR2HSV);
     cv::inRange(hsv_image, cv::Scalar(10, 150, 150), cv::Scalar(50, 200, 255), yellow_mask);
     
     grayImage.copyTo(hsv_image, yellow_mask);

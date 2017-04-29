@@ -49,7 +49,7 @@
     //int VideoStream = 1; // card Tracking
     //int VideoStream = 2; // card Recognition
     
-    TRACK_RESCALE = 0.60;
+    TRACK_RESCALE = 1.00;
     
     //int minHessian = 800;
     //surfDetector = new cv::SurfFeatureDetector(minHessian); // set the detector
@@ -230,16 +230,18 @@
     
     
     // blur image before downsampling
+    cv::Mat colorImage;
     cv::Mat grayImage;
     cv::Mat resizeImage;
-    cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY);
-    cv::GaussianBlur(grayImage, resizeImage, cv::Size(5,5), 1.0, 1.0);
-    cv::resize(resizeImage, grayImage, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
+    //cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY);
+    cv::GaussianBlur(image, resizeImage, cv::Size(5,5), 1.0, 1.0);
+    cv::resize(resizeImage, colorImage, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
     //cv::cvtColor(resizeImage, grayImage, cv::COLOR_BGR2GRAY);
     
     
     if(card_recognition < 60){
         card_corners = cardRecognition(image);
+        cv::cvtColor(colorImage, grayImage, cv::COLOR_BGR2GRAY);
         prevImage = grayImage.clone();
         
         //featureTrack(grayImage, prefeaturesCorners);
@@ -254,10 +256,10 @@
         //cardTracking(card_corners, grayImage, prevImage, prefeaturesCorners);
         
         // card can't move independently, only move camera
+        cv::cvtColor(colorImage, grayImage, cv::COLOR_BGR2GRAY);
         cardAllFindhomography(prevImage, grayImage, card_corners, TRACK_RESCALE, brisk_detector_);
-        //cardAllFindhomography(prevImage, grayImage, card_corners, TRACK_RESCALE, surfExtractor, surfDetector);
         
-        trackingCorner(grayImage, card_corners, image, TRACK_RESCALE);
+        trackingCorner(colorImage, card_corners, image, TRACK_RESCALE);
         
         prevImage = grayImage.clone();
         [self plotCircle:image points:card_corners];
