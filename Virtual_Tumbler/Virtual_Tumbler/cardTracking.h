@@ -14,6 +14,8 @@ void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv
 
 void trackingCorner(cv::Mat &grayImage, cv::vector<cv::vector<cv::Point>> &card_corners, cv::Mat &image, float TRACK_RESCALE);
 
+cv::vector<cv::Point> getQuadpointOneCard(cv::vector<cv::vector<cv::Point>> &one_card_contours);
+
 void cardTrackingOpticalFlow(cv::vector<cv::vector<cv::Point>> &card_corners, cv::Mat &image, cv::Mat &prevImage, cv::vector<cv::Point2f> &prefeaturesCorners);
 void featureTrack(cv::Mat &grayImage, cv::vector<cv::Point2f> &featuresCorners);
 
