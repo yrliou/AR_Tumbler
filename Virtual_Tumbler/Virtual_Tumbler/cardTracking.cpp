@@ -32,34 +32,13 @@ void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv
     
     matcher.match( descriptors_prev, descriptors_current, matches );
     
-    //double max_dist = 0; double min_dist = 100;
-    
-    ////-- Quick calculation of max and min distances between keypoints
-    //for( int i = 0; i < descriptors_prev.rows; i++ ){
-    //    double dist = matches[i].distance;
-    //    if( dist < min_dist ) min_dist = dist;
-    //    if( dist > max_dist ) max_dist = dist;
-    //}
-    
-    //std::cout << "match keyfeatures number " << matches.size() << std::endl;
-    
-    //std::cout << "max dist is " << max_dist << std::endl;
-    //std::cout << "min dist is " << min_dist << std::endl;
-    
-    //cv::vector< cv::DMatch > good_matches;
-    //for(int i=0;i < descriptors_prev.rows; i++){
-    //    if(matches[i].distance < MIN_DIST * min_dist){
-    //        good_matches.push_back(matches[i]);
-    //    }
-    //}
-    
     //-- Localize the object
     cv::vector<cv::Point2f> previousPoints;
     cv::vector<cv::Point2f> currentPoints;
     
     for( int i = 0; i < matches.size(); i++ )
     {
-        //-- Get the keypoints from the good matches
+        //-- Get the keypoints from matches
         previousPoints.push_back( keypoints_prev[ matches[i].queryIdx ].pt );
         currentPoints.push_back( keypoints_current[ matches[i].trainIdx ].pt );
     }
@@ -70,7 +49,6 @@ void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv
     cv::Mat cardsHomography = cv::findHomography( previousPoints, currentPoints, CV_RANSAC );
     
     //std::cout << "cards Homography\n" << cardsHomography << std::endl;
-    
     
     for(int i = 0; i < card_corners.size(); i++){
         cv::vector<cv::Point2f> corners_(card_corners[i].size());
@@ -83,27 +61,25 @@ void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv
             corners_[k] = cv::Point2f((card_corners[i][k].x) * TRACK_RESCALE, (card_corners[i][k].y)* TRACK_RESCALE) ;
         }
         
-        
         cv::perspectiveTransform(corners_, corners_transform, cardsHomography);
         
         
-        // rescale back in trackingCorner
         /*
         for(int j = 0; j < card_corners[i].size(); j++){
             card_corners[i][j].x = corners_transform[j].x / TRACK_RESCALE;
             card_corners[i][j].y = corners_transform[j].y / TRACK_RESCALE;
         }
         */
+        // rescale back in trackingCorner
+        // IMPORTATN since in trackingCorner function, we need resized corner, so
+        // we rescale back in trackingCorner
         for(int j = 0; j < card_corners[i].size(); j++){
             card_corners[i][j].x = corners_transform[j].x;
             card_corners[i][j].y = corners_transform[j].y;
         }
         
-        
         //std::cout << "final update card_corners\n" << card_corners[i] << std::endl;
     }
-    
-    
 }
 
 void trackingCorner(cv::Mat &colorImage, cv::vector<cv::vector<cv::Point>> &card_corners, cv::Mat &image, float TRACK_RESCALE){
@@ -113,10 +89,7 @@ void trackingCorner(cv::Mat &colorImage, cv::vector<cv::vector<cv::Point>> &card
     cv::Mat yellow_mask;
     cv::Mat grayImage;
     cv::Mat hsv_image;
-    //cv::GaussianBlur(hsv_image, gray_image, cv::Size(5,5), 1.2, 1.2);
-    //cv::resize(gray_image, gray_image, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
     cv::cvtColor(colorImage, grayImage, cv::COLOR_BGR2GRAY);
-    
     
     cv::cvtColor(colorImage, hsv_image, cv::COLOR_BGR2HSV);
     cv::inRange(hsv_image, cv::Scalar(10, 150, 150), cv::Scalar(50, 200, 255), yellow_mask);
@@ -127,8 +100,8 @@ void trackingCorner(cv::Mat &colorImage, cv::vector<cv::vector<cv::Point>> &card
     //*****************  canny edge for all picture
     
     cv::Mat wholecanny_edge;
-    cv::GaussianBlur(hsv_image, gray_image, cv::Size(5,5), 1.2, 1.2);
-    cv::Canny(gray_image, wholecanny_edge, 30, 100, 3);
+    //cv::GaussianBlur(hsv_image, gray_image, cv::Size(5,5), 1.2, 1.2);
+    cv::Canny(hsv_image, wholecanny_edge, 30, 100, 3);
     
     for(int i = 0; i < card_corners.size(); i++){
         
@@ -145,7 +118,7 @@ void trackingCorner(cv::Mat &colorImage, cv::vector<cv::vector<cv::Point>> &card
         cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4), cv::Point(1,1));
         // After test, 4 has robust performance, but the cards can not too close to each other:
         cv::morphologyEx(canny_edge, canny_edge, 4, element);
-    
+        
         //debug
         //cv::resize(canny_edge, image, cv::Size(), 1/TRACK_RESCALE, 1/TRACK_RESCALE);
         
@@ -224,29 +197,6 @@ cv::vector<cv::Point> getQuadpointOneCard(cv::vector<cv::vector<cv::Point>> &one
     }
     
     return card_corners;
-    
-    /*  approxPolyDP
-    cv::vector<cv::Point> approx;
-    cv::vector<cv::Point> card_corners;
-    
-    for(int i = 0; i < one_card_contours.size(); i++){
-        float epsilon = 0.05 * cv::arcLength(one_card_contours[i], true);
-        cv::approxPolyDP(one_card_contours[i], approx, epsilon, true);
-        //std::cout << " card_corners index " << i << " has " << approx.size() << std::endl;
-        
-        if(approx.size() == 4){
-            card_corners = approx;
-        }
-        else{
-            std::cout << "getQuadpoitOneCard corners number is " << approx.size() << std::endl;
-            std::cout << "Error when updating One card corners" << std::endl;
-        }
-    }
-    
-    return card_corners;
-    */
-    
-    
     
 }
 

@@ -56,8 +56,6 @@ cv::vector<cv::vector<cv::Point>> cardRecognition(cv::Mat &image){
     // 3. limit cards card detection number by MAX_CARDS_DETECT
     cv::vector<cv::vector<cv::Point>> contours_remove_small_area;
     
-    //printContourArea(contours);
-    
     contours_remove_small_area = removeSmallArea(contours, MIN_AREA, MAX_AREA);
     
     std::sort(contours_remove_small_area.begin(), contours_remove_small_area.end(), compareContourAreas);
@@ -65,11 +63,6 @@ cv::vector<cv::vector<cv::Point>> cardRecognition(cv::Mat &image){
     //printContourArea(contours);
     cv::vector<cv::vector<cv::Point>> card_contours;
     card_contours = removeFalseContour(contours_remove_small_area, MAX_CARDS_DETECT);
-    
-    //std::cout << "nodata" << std::endl;
-    //printContourArea(card_contours);
-    
-    //printContourArea(card_contours);
     // Result of this stage is card_contours
     
     //************     Get four corners of cards
@@ -177,7 +170,6 @@ cv::vector<cv::vector<cv::Point>> getQuadpointHough(cv::vector<cv::vector<cv::Po
         int Hough_current_threshold = 16;
         for(int H_i = 0; H_i < MAX_HOUHPHLINE; H_i++){
             cv::HoughLines(corners_image, lines, 1, CV_PI/180, Hough_current_threshold);
-            //cv::HoughLines(corners_image, lines, 1, 1.0/100, Hough_current_threshold);
             
             if(lines.size() < MIN_LINE){
                 Hough_current_max = Hough_current_threshold;
@@ -189,7 +181,6 @@ cv::vector<cv::vector<cv::Point>> getQuadpointHough(cv::vector<cv::vector<cv::Po
             }
             else{
                 // lines.size() within the range
-                //cv::HoughLines(corners_image, lines, 1, 1.0/128, Hough_current_threshold);
                 break;
             }
         }
@@ -296,8 +287,6 @@ cv::vector<cv::vector<cv::Point>> removeFalseContour(cv::vector<cv::vector<cv::P
         }
     }
     
-    //std::cout << "return removeFalseContour" << std::endl;
-    //printContourArea(card_contours);
     return card_contours;
 }
 

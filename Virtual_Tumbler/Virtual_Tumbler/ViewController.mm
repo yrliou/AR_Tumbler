@@ -15,23 +15,21 @@
 
 
 @interface ViewController (){
-    UIImageView *imageView_;
+    // show FPS
     UITextView *fpsView_;
     int64 curr_time_;
-    int card_recognition;
-    cv::vector<cv::vector<cv::Point>> card_corners;
     
-    cv::Mat prevImage;
-    //cv::vector<cv::Point2f> prefeaturesCorners;
+    // show image
+    UIImageView *imageView_;
+    
+    // card tracking and recognition
+    int card_recognition; // count for going to card recognition
+    cv::vector<cv::vector<cv::Point>> card_corners;
+    cv::Mat prevImage; // store the previous image for calculating homography
     float TRACK_RESCALE;
     
-    // SURF is too slow
-    //cv::SurfFeatureDetector *surfDetector;
-    //cv::SurfDescriptorExtractor *surfExtractor;
-    //cv::Ptr<cv::FeatureDetector> Detector_;
-    //cv::Ptr<cv::DescriptorExtractor> Extractor_;
+    // Used for homography
     cv::BRISK *brisk_detector_;
-    
 }
 
 @end
@@ -43,22 +41,19 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    //Boolean VideoStream = true;
-    //Boolean VideoStream = false;
+    
+    // Choose which mode
     int VideoStream = 0; // Video
     //int VideoStream = 1; // card Tracking
     //int VideoStream = 2; // card Recognition
     
-    TRACK_RESCALE = 1.00;
+    TRACK_RESCALE = 0.50;
     
-    //int minHessian = 800;
-    //surfDetector = new cv::SurfFeatureDetector(minHessian); // set the detector
-    //surfExtractor = new cv::SurfDescriptorExtractor(); // Set the extractor
+    //setup Brisk descriptor and detector
     int thresh = 30;
     int octaves = 3;
     float patternSacle = 1.0f;
     brisk_detector_ = new cv::BRISK(thresh, octaves, patternSacle);
-    
     
     [self VideoStillImage:VideoStream];
 }
@@ -98,23 +93,24 @@
         [self showImage:inputImageFirst];
         
         cv::Mat cvImageFirst = [self cvMatFromUIImage:inputImageFirst];
-        cv::Mat processImageFirst;
-        cv::cvtColor(cvImageFirst, processImageFirst, CV_RGBA2BGR);
         
         // process image first - card recognition
+        cv::cvtColor(cvImageFirst, cvImageFirst, CV_RGB2BGR);
         cv::vector<cv::vector<cv::Point>> card_cornersFirst;
-        card_cornersFirst = cardRecognition(processImageFirst);
-        
-        [self plotCircle:processImageFirst points:card_cornersFirst];
-        cv::cvtColor(processImageFirst, processImageFirst, CV_BGR2RGBA);
+        card_cornersFirst = cardRecognition(cvImageFirst);
+        //std::cout << "size of card_cornersFirst " << card_cornersFirst.size() << std::endl;
+        [self plotCircle:cvImageFirst points:card_cornersFirst];
+        cv::cvtColor(cvImageFirst, cvImageFirst, CV_BGR2RGB);
         
         // process second image
         cv::Mat cvImageSecond = [self cvMatFromUIImage:second_frame];
+        cv::cvtColor(cvImageSecond, cvImageSecond, CV_RGB2BGR);
         cv::Mat grayImageSecond;
+        cv::Mat colorImageSecond;
         cv::Mat resizeImageSecond;
-        cv::cvtColor(cvImageSecond, grayImageSecond, cv::COLOR_BGR2GRAY);
-        cv::GaussianBlur(grayImageSecond, resizeImageSecond, cv::Size(5,5), 1.0, 1.0);
-        cv::resize(resizeImageSecond, grayImageSecond, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
+        cv::GaussianBlur(cvImageSecond, resizeImageSecond, cv::Size(5,5), 1.0, 1.0);
+        cv::resize(resizeImageSecond, colorImageSecond, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
+        cv::cvtColor(colorImageSecond, grayImageSecond, cv::COLOR_BGR2GRAY);
         
         cv::Mat grayImageFirst;
         cv::Mat resizeImageFirst;
@@ -125,29 +121,27 @@
         std::cout << "TRACK_RESCALE is " << TRACK_RESCALE << std::endl;
         
         // tracking
-        std::cout << "original card size in first frame is " << card_cornersFirst.size() << std::endl;
-        for(int i = 0; i < card_cornersFirst.size(); i++){
-            std::cout << "original first card corners " << i << " from card recognition\n" << card_cornersFirst[i] << std::endl;
-        }
-        
         cardAllFindhomography(grayImageFirst, grayImageSecond, card_cornersFirst, TRACK_RESCALE, brisk_detector_);
-        trackingCorner(grayImageSecond, card_cornersFirst, cvImageSecond, TRACK_RESCALE);
-        
+        trackingCorner(colorImageSecond, card_cornersFirst, cvImageSecond, TRACK_RESCALE);
         [self plotCircle:cvImageSecond points:card_cornersFirst];
-        //cv::cvtColor(cvImageSecond, cvImageSecond, CV_BGR2RGBA);
+        cv::cvtColor(cvImageSecond, cvImageSecond, CV_BGR2RGB);
         
         // process third image
         cv::Mat cvImageThird = [self cvMatFromUIImage:third_frame];
+        cv::cvtColor(cvImageThird, cvImageThird, CV_RGB2BGR);
         cv::Mat grayImageThird;
+        cv::Mat colorImageThird;
         cv::Mat resizeImageThird;
-        cv::cvtColor(cvImageThird, grayImageThird, cv::COLOR_BGR2GRAY);
-        cv::GaussianBlur(grayImageThird, resizeImageThird, cv::Size(5,5), 1.0, 1.0);
-        cv::resize(resizeImageThird, grayImageThird, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
+        cv::GaussianBlur(cvImageThird, resizeImageThird, cv::Size(5,5), 1.0, 1.0);
+        cv::resize(resizeImageThird, colorImageThird, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
+        cv::cvtColor(colorImageThird, grayImageThird, cv::COLOR_BGR2GRAY);
         
         //tracking
         cardAllFindhomography(grayImageSecond, grayImageThird, card_cornersFirst, TRACK_RESCALE, brisk_detector_);
-        trackingCorner(grayImageThird, card_cornersFirst, cvImageThird, TRACK_RESCALE);
+        trackingCorner(colorImageThird, card_cornersFirst, cvImageThird, TRACK_RESCALE);
+        //std::cout << "size of card_cornersFirst " << card_cornersFirst.size() << "\n" << card_cornersFirst[0] << "\n" << card_cornersFirst[1] << std::endl;
         [self plotCircle:cvImageThird points:card_cornersFirst];
+        cv::cvtColor(cvImageThird, cvImageThird, CV_BGR2RGB);
         
         // show on the screen
         imageView_.image = [self UIImageFromCVMat:cvImageThird];
@@ -200,17 +194,11 @@
         cv::vector<cv::vector<cv::Point>> card_corners;
         card_corners = cardRecognition(processImage);
         
-        // Test fillpoly to get a mask
-        cv::fillConvexPoly(processImage, card_corners[0], cv::Scalar(0,255,0));
-        
         [self plotCircle:processImage points:card_corners];
         cv::cvtColor(processImage, processImage, CV_BGR2RGBA);
         
-        
         // show on the screen
         imageView_.image = [self UIImageFromCVMat:processImage];
-        
-        //imageView_.image = inputImage;
     }
     
 }
@@ -223,28 +211,25 @@
 // Function to run apply image on
 - (void) processImage:(cv::Mat &)image
 {
-    
-    //card_corners = cardRecognition(image);
-    //[self plotCircle:image points:card_corners];
-    
+    // Card Recognition
+    /*
+    card_corners = cardRecognition(image);
+    [self plotCircle:image points:card_corners];
+    */
     
     
     // blur image before downsampling
     cv::Mat colorImage;
     cv::Mat grayImage;
     cv::Mat resizeImage;
-    //cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY);
     cv::GaussianBlur(image, resizeImage, cv::Size(5,5), 1.0, 1.0);
+    //cv::medianBlur(image, resizeImage, 5);
     cv::resize(resizeImage, colorImage, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
-    //cv::cvtColor(resizeImage, grayImage, cv::COLOR_BGR2GRAY);
-    
     
     if(card_recognition < 60){
         card_corners = cardRecognition(image);
         cv::cvtColor(colorImage, grayImage, cv::COLOR_BGR2GRAY);
         prevImage = grayImage.clone();
-        
-        //featureTrack(grayImage, prefeaturesCorners);
         
         //plot circle
         [self plotCircle:image points:card_corners];
@@ -257,14 +242,13 @@
         
         // card can't move independently, only move camera
         cv::cvtColor(colorImage, grayImage, cv::COLOR_BGR2GRAY);
-        cardAllFindhomography(prevImage, grayImage, card_corners, TRACK_RESCALE, brisk_detector_);
         
+        cardAllFindhomography(prevImage, grayImage, card_corners, TRACK_RESCALE, brisk_detector_);
         trackingCorner(colorImage, card_corners, image, TRACK_RESCALE);
         
         prevImage = grayImage.clone();
         [self plotCircle:image points:card_corners];
     }
-    
     
     // show FPS
     [self showFPS];
