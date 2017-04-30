@@ -189,17 +189,36 @@
         UIImage *image_test_3cards_dark = [UIImage imageNamed:@"image_test_3cards_dark.jpg"];
         if(image_test_many == nil) std::cout << "Cannot read in the file image_test_3cards_dark.jpg!!" << std::endl;
         
+        // read test_1card
+        UIImage *test_1card = [UIImage imageNamed:@"test_1card.jpg"];
+        if(test_1card == nil) std::cout << "Cannot read in the file test_1card.jpg!!" << std::endl;
+        
+        // read card from DB
+        UIImage *test_1card_data = [UIImage imageNamed:@"test_1card_data.jpg"];
+        if(test_1card_data == nil) std::cout << "Cannot read in the file test_1card_data.jpg!!" << std::endl;
+        
         //UIImage *inputImage = image_4cards;
         //UIImage *inputImage = image_3cards_hand;
         //UIImage *inputImage = image_3cards_half;
         //UIImage *inputImage = image_test_3cards;
         //UIImage *inputImage = image_test_3cards_dark;
-        UIImage *inputImage = image_test_1card;
+        // UIImage *inputImage = image_test_1card;
+        UIImage *inputImage = test_1card;
         
         // set the ImageView_ for still image
         [self showImage:inputImage];
         
+        cv::Mat cvCardSceneImg = [self cvMatFromUIImage:test_1card];
+        cv::Mat cvCardDBImg = [self cvMatFromUIImage:test_1card_data];
+        
+        cvtColor(cvCardSceneImg, cvCardSceneImg, CV_RGBA2GRAY);
+        cvtColor(cvCardDBImg, cvCardDBImg, CV_RGBA2GRAY);
+        
+        cv::Mat H_cv = cardFindhomography(cvCardDBImg, cvCardSceneImg, 1.0, brisk_detector_);
+        
         cv::Mat cvImage = [self cvMatFromUIImage:inputImage];
+        // cv::Mat cvImage = [self cvMatFromUIImage:test_1card_data];
+        /*
         cv::Mat processImage;
         cv::cvtColor(cvImage, processImage, CV_RGBA2BGR);
         
@@ -209,9 +228,36 @@
         
         [self plotCircle:processImage points:card_corners];
         cv::cvtColor(processImage, processImage, CV_BGR2RGBA);
+        */
+        // Load the 3D sphere points (dimensions of ball are in cm)
+        NSString *str = [[NSBundle mainBundle] pathForResource:@"sphere" ofType:@"txt"];
+        const char *SphereName = [str UTF8String]; // Convert to const char *
+        arma::fmat sphere;sphere.load(SphereName); // Load the Sphere into memory should be 3xN
+        
+        cv::Mat I = (cv::Mat_<float>(3,3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
+        cv::Mat k = (cv::Mat_<float>(3,3) << 1899.4, 0, 978.3, 0, 1897.5, 549.7, 0, 0, 1);
+        // cv::Mat k = (cv::Mat_<float>(3,3) << 3043.72, 0, 1196, 0, 3043.72, 1604, 0, 0, 1);
+        
+        // test using identity as first extrinsic
+        // H_cv = k * I;
+        
+        std::cout << H_cv << std::endl;
+        
+        // cv::mat to arma
+        cv::Mat H_cv_transpose;
+        cv::transpose(H_cv, H_cv_transpose);
+        arma::fmat arma_mat(reinterpret_cast<float*>(H_cv_transpose.data), H_cv_transpose.rows, H_cv_transpose.cols);
+        
+        // project using homography
+        arma::fmat X = myproj_homography(sphere, arma_mat);
+        const cv::Scalar YELLOW = cv::Scalar(255,255,0);
+        cvImage = DrawPts(cvImage, X, YELLOW);
+        
+        // Finally setup the view to display
+        imageView_.image = [self UIImageFromCVMat:cvImage];
         
         // show on the screen
-        imageView_.image = [self UIImageFromCVMat:processImage];
+        // imageView_.image = [self UIImageFromCVMat:processImage];
     }
     
 }
@@ -426,5 +472,25 @@
     
     return finalImage;
 }
+
+cv::Mat DrawPts(cv::Mat &display_im, arma::fmat &pts, const cv::Scalar &pts_clr)
+{
+    std::vector<cv::Point2f> cv_pts = Arma2Points2f(pts); // Convert to vector of Point2fs
+    for(int i=0; i<cv_pts.size(); i++) {
+        cv::circle(display_im, cv_pts[i], 5, pts_clr,5); // Draw the points
+    }
+    return display_im; // Return the display image
+}
+
+// Quick function to convert Armadillo to OpenCV Points
+std::vector<cv::Point2f> Arma2Points2f(arma::fmat &pts)
+{
+    std::vector<cv::Point2f> cv_pts;
+    for(int i=0; i<pts.n_cols; i++) {
+        cv_pts.push_back(cv::Point2f(pts(0,i), pts(1,i))); // Add points
+    }
+    return cv_pts; // Return the vector of OpenCV points
+}
+
 
 @end
