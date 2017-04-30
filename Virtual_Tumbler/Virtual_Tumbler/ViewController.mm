@@ -7,12 +7,16 @@
 //
 
 #import "ViewController.h"
+
+#ifdef __cplusplus
+#include <stdlib.h>
 #include <opencv2/nonfree/features2d.hpp>
 #include <opencv2/opencv.hpp>
-#include <iostream>
 #include "cardRecognition.h"
 #include "cardTracking.h"
-
+#include "armadillo"
+#include "myfit.h"
+#endif
 
 @interface ViewController (){
     // show FPS
@@ -30,22 +34,24 @@
     
     // Used for homography
     cv::BRISK *brisk_detector_;
+    
+    arma::fmat K;
 }
 
 @end
 
 @implementation ViewController
 
-@synthesize videoCamera;
+// @synthesize videoCamera;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
     // Choose which mode
-    int VideoStream = 0; // Video
+    //int VideoStream = 0; // Video
     //int VideoStream = 1; // card Tracking
-    //int VideoStream = 2; // card Recognition
+    int VideoStream = 2; // card Recognition
     
     TRACK_RESCALE = 0.50;
     
@@ -55,15 +61,22 @@
     float patternSacle = 1.0f;
     brisk_detector_ = new cv::BRISK(thresh, octaves, patternSacle);
     
+    // K << 3043.72 <<       0 << 1196 << arma::endr
+    // <<       0 << 3043.72 << 1604 << arma::endr
+    // <<       0 <<    0    <<    1;
+    K << 1899.4 <<       0 << 978.3 << arma::endr
+    <<       0 << 1897.5 << 549.7 << arma::endr
+    <<       0 <<    0    <<    1;
+    
     [self VideoStillImage:VideoStream];
 }
 
 - (void) VideoStillImage:(int) VideoStream{
     
     if (VideoStream == 0){
-        [self cameraSetup];
+        // [self cameraSetup];
         card_recognition = 0;
-        [videoCamera start];
+        // [videoCamera start];
     }
     else if(VideoStream == 1){
         // debug tracking
@@ -274,6 +287,7 @@
 }
 
 // setup camera and put fps
+/*
 - (void) cameraSetup {
     
     
@@ -320,6 +334,7 @@
     
     
 }
+*/
 
 - (void) showFPS {
     // Finally estimate the frames per second (FPS)

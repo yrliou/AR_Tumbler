@@ -7,16 +7,25 @@
 //
 
 #import <UIKit/UIKit.h>
-#include <opencv2/opencv.hpp>
-#import <opencv2/highgui/ios.h>
+#ifdef __cplusplus
+// #import <opencv2/opencv.hpp>
+// #import "opencv2/highgui/ios.h"
+// #import <opencv2/highgui/cap_ios.h>
+#endif
+
+@interface ViewController : UIViewController
 
 
+@end
+
+/*
 @interface ViewController : UIViewController<CvVideoCameraDelegate>
 {
     CvVideoCamera* videoCamera;
 }
 // Declare internal property of videoCamera
 @property (nonatomic, retain) CvVideoCamera *videoCamera;
-
 @end
+*/
+
 
