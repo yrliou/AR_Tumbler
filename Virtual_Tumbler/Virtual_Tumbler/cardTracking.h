@@ -8,6 +8,8 @@
 #include "opencv2/nonfree/features2d.hpp"
 #include <opencv2/opencv.hpp>
 
+cv::Mat cardFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, float TRACK_RESCALE, cv::BRISK *brisk_detector_);
+
 void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv::vector<cv::Point>> &card_corners, float TRACK_RESCALE, cv::Ptr<cv::DescriptorExtractor> Extractor_, cv::Ptr<cv::FeatureDetector> Detector_);
 
 void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv::vector<cv::Point>> &card_corners, float TRACK_RESCALE, cv::BRISK *brisk_detector_);

@@ -1,6 +1,74 @@
 #include "cardTracking.h"
 #include "cardRecognition.h"
 
+cv::Mat cardFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, float TRACK_RESCALE, cv::BRISK *brisk_detector_) {
+    
+    float MIN_DIST = 20;
+    std::vector<cv::KeyPoint> keypoints_prev, keypoints_current;
+    
+    brisk_detector_->detect(prevImage, keypoints_prev);
+    brisk_detector_->detect(grayImage, keypoints_current);
+    
+    cv::Mat descriptors_prev, descriptors_current;
+    
+    brisk_detector_->compute( prevImage, keypoints_prev, descriptors_prev );
+    brisk_detector_->compute( grayImage, keypoints_current, descriptors_current );
+    
+    /*
+     if(descriptors_prev.type()!=CV_32F){
+     descriptors_prev.convertTo(descriptors_prev, CV_32F);
+     }
+     if(descriptors_current.type()!=CV_32F){
+     descriptors_current.convertTo(descriptors_current, CV_32F);
+     }
+     */
+    
+    
+    // matching descriptors
+    // for flann, BRIEF\ORB\FREAK have to use either LSH or Hierarchical clustering indexa
+    //cv::FlannBasedMatcher matcher;
+    cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(20,10,2));
+    cv::vector<cv::DMatch> matches;
+    
+    matcher.match( descriptors_prev, descriptors_current, matches );
+    
+    //double max_dist = 0; double min_dist = 100;
+    
+    ////-- Quick calculation of max and min distances between keypoints
+    //for( int i = 0; i < descriptors_prev.rows; i++ ){
+    //    double dist = matches[i].distance;
+    //    if( dist < min_dist ) min_dist = dist;
+    //    if( dist > max_dist ) max_dist = dist;
+    //}
+    
+    //std::cout << "match keyfeatures number " << matches.size() << std::endl;
+    
+    //std::cout << "max dist is " << max_dist << std::endl;
+    //std::cout << "min dist is " << min_dist << std::endl;
+    
+    //cv::vector< cv::DMatch > good_matches;
+    //for(int i=0;i < descriptors_prev.rows; i++){
+    //    if(matches[i].distance < MIN_DIST * min_dist){
+    //        good_matches.push_back(matches[i]);
+    //    }
+    //}
+    
+    //-- Localize the object
+    cv::vector<cv::Point2f> previousPoints;
+    cv::vector<cv::Point2f> currentPoints;
+    
+    for( int i = 0; i < matches.size(); i++ )
+    {
+        //-- Get the keypoints from the good matches
+        previousPoints.push_back( keypoints_prev[ matches[i].queryIdx ].pt );
+        currentPoints.push_back( keypoints_current[ matches[i].trainIdx ].pt );
+    }
+    std::cout << "matches numbers " << matches.size() << std::endl;
+    
+    cv::Mat cardsHomography = cv::findHomography( previousPoints, currentPoints, CV_RANSAC );
+    return cardsHomography;
+}
+
 void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv::vector<cv::Point>> &card_corners, float TRACK_RESCALE, cv::BRISK *brisk_detector_){
     
     float MIN_DIST = 20;
