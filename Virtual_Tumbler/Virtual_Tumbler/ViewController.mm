@@ -286,6 +286,13 @@
         prevImage = grayImage.clone();
         [self plotCircle:image points:card_corners];
     }
+    
+    // convert to RGB for displaying
+    cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
+    
+    // rotate for portait mode
+    cv::transpose(image, image);
+    cv::flip(image, image, 1);
 
     // show FPS
     [self showFPS];
