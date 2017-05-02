@@ -16,4 +16,6 @@ cv::vector<cv::Point2f> Arma2Points2f(arma::fmat &pts);
 
 void projectImageTest(cv::Mat &firstframe, cv::Mat &secondframe, cv::ORB *orb_detector_, const char *model3dname);
 
+cv::vector<std::string>  findcardname(cv::vector<cv::vector<cv::KeyPoint>> keypoints_database, cv::vector<cv::Mat> descriptors_database, cv::Mat grayImage, float TRACK_RESCALE, cv::ORB *orb_detector_);
+
 #endif

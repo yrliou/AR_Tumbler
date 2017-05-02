@@ -21,16 +21,85 @@ void projectImageTest(cv::Mat &firstframe, cv::Mat &secondframe, cv::ORB *orb_de
     <<       0 << 3043.72 << 1604 << arma::endr
     <<       0 <<    0    <<    1;
     
+    Tau.at(0,0) += 3;
+    Tau.at(1,0) -= 2;
+    
     arma::fmat sphere; sphere.load(model3dname);
     
     arma::fmat pts_in_camera_frame = Omega * sphere + repmat(Tau, 1, sphere.n_cols);
     arma::fmat pts_2d = K * pts_in_camera_frame;
-    pts_2d = pts_2d.rows(0,1) / repmat(pts_2d.row(2), 2, 1);
+    pts_2d = pts_2d.rows(0,2) / repmat(pts_2d.row(2), 3, 1);
     
     arma::fmat sphere_2d = pts_2d.rows(0,1);
     
     const cv::Scalar YELLOW = cv::Scalar(255,255,0);
     cv::Mat cvImage = DrawPts(firstframe, sphere_2d, YELLOW);
+    
+    //find homography
+    //gray image
+    cv::Mat first_gray;
+    cv::Mat second_gray;
+    cv::cvtColor(firstframe, first_gray, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(secondframe, second_gray, cv::COLOR_BGR2GRAY);
+    
+    std::vector<cv::KeyPoint> keypoints_first;
+    cv::Mat descriptor_first;
+    std::vector<cv::KeyPoint> keypoints_second;
+    cv::Mat descriptor_second;
+    
+    orb_detector_->detect(firstframe, keypoints_first);
+    orb_detector_->detect(secondframe, keypoints_second);
+    orb_detector_->compute(firstframe, keypoints_first, descriptor_first );
+    orb_detector_->compute(secondframe, keypoints_second, descriptor_second );
+    
+    cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(20,10,2));
+    cv::vector<cv::DMatch> matches;
+    
+    matcher.match( descriptor_first, descriptor_second, matches );
+    
+    //-- Localize the object
+    cv::vector<cv::Point2f> firstPoints;
+    cv::vector<cv::Point2f> secondPoints;
+    
+    for( int i = 0; i < matches.size(); i++ )
+    {
+        //-- Get the keypoints from matches
+        firstPoints.push_back( keypoints_first[ matches[i].queryIdx ].pt );
+        secondPoints.push_back( keypoints_second[ matches[i].trainIdx ].pt );
+    }
+    std::cout << "matches numbers " << matches.size() << std::endl;
+    
+    cv::Mat mask;
+    cv::Mat cardsHomography = cv::findHomography( firstPoints, secondPoints, CV_RANSAC, 3, mask);
+    
+    int count_inliner = 0;
+    for(int i = 0; i < mask.rows; i++){
+        if (mask.at<uchar>(i)== 1){
+            count_inliner += 1;
+        }
+    }
+    
+    std::cout << "projection inliner numbers " << count_inliner << std::endl;
+    std::cout << "homography\n" << cardsHomography << std::endl;
+    
+    // cv::mat(row major) to arma::mat (column major),
+    cv::transpose(cardsHomography, cardsHomography);
+    std::cout << "transpose homography\n" << cardsHomography << std::endl;
+    
+    arma::mat arma_homo( reinterpret_cast<double*>(cardsHomography.data), cardsHomography.rows, cardsHomography.cols );
+    
+    std::cout << "arma_homo\n" << arma_homo << std::endl;
+    
+    //update pts_2d
+    arma::fmat pts_2d_update = arma::conv_to<arma::fmat>::from(arma_homo) * pts_2d;
+    
+    pts_2d_update = pts_2d_update.rows(0,2) / repmat(pts_2d_update.row(2), 3, 1);
+    
+    arma::fmat sphere_2d_update = pts_2d_update.rows(0,1);
+    
+    const cv::Scalar RED = cv::Scalar(0,255,255);
+    cv::Mat cvImage_update = DrawPts(secondframe, sphere_2d_update, RED);
+    
 }
 
 // Quick function to draw points on an UIImage
@@ -50,6 +119,13 @@ cv::vector<cv::Point2f> Arma2Points2f(arma::fmat &pts)
         cv_pts.push_back(cv::Point2f(pts(0,i), pts(1,i))); // Add points
     }
     return cv_pts; // Return the vector of OpenCV points
+}
+
+cv::vector<std::string>  findcardname(cv::vector<cv::vector<cv::KeyPoint>> keypoints_database, cv::vector<cv::Mat> descriptors_database, cv::Mat grayImage, float TRACK_RESCALE, cv::ORB *orb_detector_){
+    
+    cv::vector<std::string> cardname;
+    
+    return cardname;
 }
 
 cv::Mat homographyinliner( std::vector<cv::KeyPoint> keypoints_database, cv::Mat descriptors_database, cv::Mat card_image , int &inlinernumber, cv::ORB *orb_detector_, cv::Mat &database_image){

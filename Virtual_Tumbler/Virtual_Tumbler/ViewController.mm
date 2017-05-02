@@ -42,6 +42,8 @@
     cv::ORB *orb_detector_;
     
     cv::vector<cv::vector<cv::KeyPoint>> keypoints_database;
+    cv::vector<cv::Mat> descriptors_database;
+    cv::vector<std::string> cardname;
 }
 
 // AVFoundation video
@@ -92,6 +94,10 @@
 - (void) VideoStillImage:(int) VideoStream{
     
     if (VideoStream == 0){
+        //preprocessing database images
+        [self databaseProcessing];
+        
+        // camera start
         [self cameraSetup];
         card_recognition = 0;
         [self.captureSession startRunning];
@@ -340,11 +346,11 @@
         // card projection test
         std::cout << "card projection" << std::endl;
         
-        UIImage *first_frame = [UIImage imageNamed:@"first_frame.jpg"];
-        if(first_frame == nil) std::cout << "Cannot read in the file first_frame.jpg!!" << std::endl;
+        UIImage *first_frame = [UIImage imageNamed:@"first_frame.png"];
+        if(first_frame == nil) std::cout << "Cannot read in the file first_frame.png!!" << std::endl;
         
-        UIImage *second_frame = [UIImage imageNamed:@"second_frame.jpg"];
-        if(second_frame == nil) std::cout << "Cannot read in the file second_frame.jpg!!" << std::endl;
+        UIImage *second_frame = [UIImage imageNamed:@"second_frame.png"];
+        if(second_frame == nil) std::cout << "Cannot read in the file second_frame.png!!" << std::endl;
         
         // transfer to Mat from UIImage
         cv::Mat firstframe = [self cvMatFromUIImage:first_frame];
@@ -371,6 +377,50 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void) databaseProcessing {
+    
+    // load database image
+    UIImage *magnemite_database = [UIImage imageNamed:@"magnemite_database.jpg"];
+    if(magnemite_database == nil) std::cout << "Cannot read in the file magnemite_database.jpg!!" << std::endl;
+    
+    UIImage *dedenne_database = [UIImage imageNamed:@"dedenne_database.jpg"];
+    if(dedenne_database == nil) std::cout << "Cannot read in the file dedenne_database.jpg!!" << std::endl;
+    
+    // transfer to Mat from UIImage
+    cv::Mat ReferenceA = [self cvMatFromUIImage:magnemite_database];
+    cv::cvtColor(ReferenceA, ReferenceA, CV_RGB2BGR);
+    
+    cv::Mat ReferenceB = [self cvMatFromUIImage:dedenne_database];
+    cv::cvtColor(ReferenceB, ReferenceB, CV_RGB2BGR);
+    
+    float DATABASERESCALE = 0.5;
+    cv::Mat grayinputA;
+    cv::GaussianBlur(ReferenceA, grayinputA, cv::Size(5,5), 1.2, 1.2);
+    cv::resize(grayinputA, grayinputA, cv::Size(), DATABASERESCALE, DATABASERESCALE);
+    cv::cvtColor(grayinputA, grayinputA, cv::COLOR_BGR2GRAY);
+    
+    cv::Mat grayinputB;
+    cv::GaussianBlur(ReferenceB, grayinputB, cv::Size(5,5), 1.2, 1.2);
+    cv::resize(grayinputB, grayinputB, cv::Size(), DATABASERESCALE, DATABASERESCALE);
+    cv::cvtColor(grayinputB, grayinputB, cv::COLOR_BGR2GRAY);
+    
+    std::vector<cv::KeyPoint> keypoints_A;
+    std::vector<cv::KeyPoint> keypoints_B;
+    cv::Mat descriptor_A;
+    cv::Mat descriptor_B;
+    
+    orb_detector_->detect(grayinputA, keypoints_A);
+    orb_detector_->detect(grayinputB, keypoints_B);
+    orb_detector_->compute(grayinputA, keypoints_A, descriptor_A );
+    orb_detector_->compute(grayinputB, keypoints_B, descriptor_B );
+    
+    keypoints_database.push_back(keypoints_A);
+    keypoints_database.push_back(keypoints_B);
+    
+    descriptors_database.push_back(descriptor_A);
+    descriptors_database.push_back(descriptor_B);
 }
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
@@ -401,6 +451,8 @@
     // put frame buffer in open cv Mat, no memory copied
     cv::Mat bufImg(bufferHeight, bufferWidth, format_opencv, bufferAddress, bytesPerRow);
 
+    //************************************************ processing image
+    
     // start processing the frame image
     cv::Mat image = bufImg.clone();
     // change to BGR
@@ -412,12 +464,25 @@
     [self plotCircle:image points:card_corners];
     */
 
-    // blur image before downsampling
+    // Card Identify
     cv::Mat colorImage;
     cv::Mat grayImage;
     cv::Mat resizeImage;
+    // blur image before downsampling
     cv::GaussianBlur(image, resizeImage, cv::Size(5,5), 1.0, 1.0);
-    //cv::medianBlur(image, resizeImage, 5);
+    cv::resize(resizeImage, colorImage, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
+     cv::cvtColor(colorImage, grayImage, cv::COLOR_BGR2GRAY);
+    card_corners = cardRecognition(image);
+    // card_corners are in the original size
+    cardname = findcardname(keypoints_database, descriptors_database, grayImage, TRACK_RESCALE, orb_detector_);
+    
+    // the main function
+    /*
+    cv::Mat colorImage;
+    cv::Mat grayImage;
+    cv::Mat resizeImage;
+    // blur image before downsampling
+    cv::GaussianBlur(image, resizeImage, cv::Size(5,5), 1.0, 1.0);
     cv::resize(resizeImage, colorImage, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
     
     if(card_recognition < 60){
@@ -443,7 +508,7 @@
         prevImage = grayImage.clone();
         [self plotCircle:image points:card_corners];
     }
-    
+    */
     // convert to RGB for displaying
     cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
     
@@ -454,6 +519,8 @@
     // show FPS
     [self showFPS];
 
+    //************************************************ end of processing image
+    
     // show result image
     CGImageRef dstImage;
     CGBitmapInfo bitmapInfo;
