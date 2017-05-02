@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+
 #include <opencv2/nonfree/features2d.hpp>
 #include <opencv2/opencv.hpp>
 #include <iostream>
@@ -14,6 +15,7 @@
 #include "cardTracking.h"
 #import <AVFoundation/AVFoundation.h>
 // #include "armadillo"
+#include "cardIdentify.h"
 
 @interface ViewController () <AVCaptureVideoDataOutputSampleBufferDelegate> {
     // show FPS
@@ -34,6 +36,11 @@
     
     // Used for homography
     cv::BRISK *brisk_detector_;
+    
+    // Used for card identify
+    cv::ORB *orb_detector_;
+    
+    cv::vector<cv::vector<cv::KeyPoint>> keypoints_database;
 }
 
 // AVFoundation video
@@ -51,9 +58,11 @@
     // Do any additional setup after loading the view, typically from a nib.
     
     // Choose which mode
-    int VideoStream = 0; // Video
+    //int VideoStream = 0; // Video
     //int VideoStream = 1; // card Tracking
     //int VideoStream = 2; // card Recognition
+    //int VideoStream = 3; // card identify
+    int VideoStream = 4; // card projection
     
     TRACK_RESCALE = 0.50;
     
@@ -62,6 +71,19 @@
     int octaves = 3;
     float patternSacle = 1.0f;
     brisk_detector_ = new cv::BRISK(thresh, octaves, patternSacle);
+    
+    
+    //setup ORB
+    int nfeatures=200;
+    float scaleFactor=1.2f;
+    int nlevels=8;
+    int edgeThreshold=31;
+    int firstLevel=0;
+    int WTA_K=2;
+    int scoreType=cv::ORB::HARRIS_SCORE;
+    int patchSize=31;
+    
+    orb_detector_ = new cv::ORB(nfeatures,scaleFactor,nlevels,edgeThreshold,firstLevel,WTA_K,scoreType,patchSize);
     
     [self VideoStillImage:VideoStream];
 }
@@ -74,6 +96,8 @@
         [self.captureSession startRunning];
     }
     else if(VideoStream == 1){
+        
+        
         // debug tracking
         
         // read image_test_1card image as the first frame
@@ -154,7 +178,7 @@
         // show on the screen
         imageView_.image = [self UIImageFromCVMat:cvImageThird];
     }
-    else{
+    else if(VideoStream == 2){
         // debug still image
         // read image_test_1card image
         UIImage *image_test_1card = [UIImage imageNamed:@"image_test_1card.jpg"];
@@ -208,7 +232,139 @@
         // show on the screen
         imageView_.image = [self UIImageFromCVMat:processImage];
     }
+    else if (VideoStream == 3){
+        // card identify
+        // read magnemite database
+        UIImage *magnemite_database = [UIImage imageNamed:@"magnemite_database.jpg"];
+        if(magnemite_database == nil) std::cout << "Cannot read in the file magnemite_database.jpg!!" << std::endl;
+        
+        UIImage *dedenne_database = [UIImage imageNamed:@"dedenne_database.jpg"];
+        if(dedenne_database == nil) std::cout << "Cannot read in the file dedenne_database.jpg!!" << std::endl;
+        
+        UIImage *magnemite_test1 = [UIImage imageNamed:@"magnemite_test1.png"];
+        if(magnemite_test1 == nil) std::cout << "Cannot read in the file magnemite_test1.jpg!!" << std::endl;
+        
+        UIImage *magnemite_test2 = [UIImage imageNamed:@"magnemite_test2.jpg"];
+        if(magnemite_test2 == nil) std::cout << "Cannot read in the file magnemite_test2.jpg!!" << std::endl;
+        
+        UIImage *dedenne_test1 = [UIImage imageNamed:@"dedenne_test1.png"];
+        if(dedenne_test1 == nil) std::cout << "Cannot read in the file dedenne_test1.jpg!!" << std::endl;
+        
+        //setup image show
+        UIImage *inputImageFirst = magnemite_database;
+        // set the ImageView_ for still image
+        [self showImage:inputImageFirst];
+        
+        // transfer to Mat from UIImage
+        cv::Mat magnemiteReference = [self cvMatFromUIImage:magnemite_database];
+        cv::cvtColor(magnemiteReference, magnemiteReference, CV_RGB2BGR);
+        
+        cv::Mat dedenneReference = [self cvMatFromUIImage:dedenne_database];
+        cv::cvtColor(dedenneReference, dedenneReference, CV_RGB2BGR);
+        
+        cv::Mat magnemiteTest1 = [self cvMatFromUIImage:magnemite_test1];
+        cv::cvtColor(magnemiteTest1, magnemiteTest1, CV_RGB2BGR);
+        
+        cv::Mat magnemiteTest2 = [self cvMatFromUIImage:magnemite_test2];
+        cv::cvtColor(magnemiteTest2, magnemiteTest2, CV_RGB2BGR);
+        
+        cv::Mat dedenneTest1 = [self cvMatFromUIImage:dedenne_test1];
+        cv::cvtColor(dedenneTest1, dedenneTest1, CV_RGB2BGR);
+        
+        // calculate keypoints for database using orb
+        cv::Mat magnemiteRgray;
+        cv::Mat dedenneRgray;
+        cv::cvtColor(magnemiteReference, magnemiteRgray, cv::COLOR_BGR2GRAY);
+        cv::cvtColor(dedenneReference, dedenneRgray, cv::COLOR_BGR2GRAY);
+        
+        cv::Mat descriptors_mag, descriptors_ded;
+        
+        std::vector<cv::KeyPoint> keypoints_mag;
+        std::vector<cv::KeyPoint> keypoints_ded;
+        
+        orb_detector_->detect(magnemiteRgray, keypoints_mag);
+        orb_detector_->detect(dedenneRgray, keypoints_ded);
+        
+        orb_detector_->compute( magnemiteRgray, keypoints_mag, descriptors_mag );
+        orb_detector_->compute( dedenneRgray, keypoints_ded, descriptors_ded );
+        
+        keypoints_database.push_back(keypoints_mag);
+        keypoints_database.push_back(keypoints_ded);
+        
+        // test on image
+        
+        int inlinernumber = 0;
+        cv::Mat homography;
+        // test case1 magnemiteTest1 with magnemiteReference
+        std::cout << "mag vs mag database" << std::endl;
+        
+        cv::Mat mag_mag = homographyinliner(keypoints_mag, descriptors_mag, magnemiteTest1, inlinernumber, orb_detector_, magnemiteRgray);
+        
+        std::cout << "mag vs mag database inliner number is " << inlinernumber << std::endl;
+        
+        // test case2 dedenneTest1 with magnemiteReference
+        std::cout << "ded vs mag database" << std::endl;
+        
+        cv::Mat ded_mag = homographyinliner(keypoints_mag, descriptors_mag, dedenneTest1, inlinernumber, orb_detector_, magnemiteRgray);
+        
+        std::cout << "ded vs mag database inliner number is " << inlinernumber << std::endl;
+        
+        // test case3 dedenneTest1 with dedenneReference
+        std::cout << "ded vs ded database" << std::endl;
+        
+        cv::Mat ded_ded = homographyinliner(keypoints_ded, descriptors_ded, dedenneTest1, inlinernumber, orb_detector_, dedenneRgray);
+        
+        std::cout << "ded vs ded database inliner number is " << inlinernumber << std::endl;
+        
+        // test case4 magnemiteTest1 with dedenneReference
+        std::cout << "mag vs ded database" << std::endl;
+        
+        cv::Mat mag_ded = homographyinliner(keypoints_ded, descriptors_ded, magnemiteTest1, inlinernumber, orb_detector_, dedenneRgray);
+        
+        std::cout << "mag vs ded database inliner number is " << inlinernumber << std::endl;
+        
+        // show on the screen
+        cv::cvtColor(mag_mag, mag_mag, CV_BGR2RGB);
+        cv::cvtColor(ded_mag, ded_mag, CV_BGR2RGB);
+        cv::cvtColor(ded_ded, ded_ded, CV_BGR2RGB);
+        cv::cvtColor(mag_ded, mag_ded, CV_BGR2RGB);
+        
+        //imageView_.image = [self UIImageFromCVMat:mag_mag];
+        //imageView_.image = [self UIImageFromCVMat:ded_mag];
+        imageView_.image = [self UIImageFromCVMat:ded_ded];
+        //imageView_.image = [self UIImageFromCVMat:mag_ded];
+        
+    }
+    else{
+        // card projection test
+        std::cout << "card projection" << std::endl;
+        
+        UIImage *first_frame = [UIImage imageNamed:@"first_frame.jpg"];
+        if(first_frame == nil) std::cout << "Cannot read in the file first_frame.jpg!!" << std::endl;
+        
+        UIImage *second_frame = [UIImage imageNamed:@"second_frame.jpg"];
+        if(second_frame == nil) std::cout << "Cannot read in the file second_frame.jpg!!" << std::endl;
+        
+        // transfer to Mat from UIImage
+        cv::Mat firstframe = [self cvMatFromUIImage:first_frame];
+        cv::cvtColor(firstframe, firstframe, CV_RGB2BGR);
+        
+        cv::Mat secondframe = [self cvMatFromUIImage:second_frame];
+        cv::cvtColor(secondframe, secondframe, CV_RGB2BGR);
     
+        [self showImage:first_frame];
+        
+        // projectiont
+        NSString *str = [[NSBundle mainBundle] pathForResource:@"sphere" ofType:@"txt"];
+        const char *SphereName = [str UTF8String];
+        projectImageTest(firstframe, secondframe, orb_detector_, SphereName);
+        
+        
+        cv::cvtColor(firstframe, firstframe, CV_BGR2RGB);
+        cv::cvtColor(secondframe, secondframe, CV_BGR2RGB);
+        
+        imageView_.image = [self UIImageFromCVMat:firstframe];
+    }
 }
 
 - (void)didReceiveMemoryWarning {

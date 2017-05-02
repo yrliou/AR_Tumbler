@@ -17,8 +17,6 @@
 		221F36C91E9834500036F3C1 /* Virtual_TumblerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 221F36C81E9834500036F3C1 /* Virtual_TumblerUITests.m */; };
 		221F36D81E9835220036F3C1 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221F36D71E9835220036F3C1 /* AVFoundation.framework */; };
 		221F36DA1E9835650036F3C1 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221F36D91E9835650036F3C1 /* opencv2.framework */; };
-		221F36DC1E9835710036F3C1 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221F36DB1E9835710036F3C1 /* Accelerate.framework */; };
-		221F36E41E984F1D0036F3C1 /* GPUImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221F36E31E984F1D0036F3C1 /* GPUImage.framework */; };
 		221F36EC1E986B960036F3C1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221F36EB1E986B960036F3C1 /* QuartzCore.framework */; };
 		221F36EE1E98934D0036F3C1 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221F36ED1E98934C0036F3C1 /* OpenGLES.framework */; };
 		221F36F21E991DE80036F3C1 /* image_test_1card.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 221F36EF1E991DE80036F3C1 /* image_test_1card.jpg */; };
@@ -29,6 +27,7 @@
 		223AAD671EAA451000C20EB9 /* image_test_4cards.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 223AAD661EAA451000C20EB9 /* image_test_4cards.jpg */; };
 		223AAD6A1EAA97F700C20EB9 /* cardTracking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 223AAD681EAA97F700C20EB9 /* cardTracking.cpp */; };
 		22791DE21E9AB08B0004EF97 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22791DE11E9AB08B0004EF97 /* AssetsLibrary.framework */; };
+		229E02A01EB57BF700B89C91 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221F36DB1E9835710036F3C1 /* Accelerate.framework */; };
 		22A2366B1EA5BEE3002CEB16 /* 3cards_half.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22A236691EA5BEE3002CEB16 /* 3cards_half.jpg */; };
 		22A2366C1EA5BEE3002CEB16 /* 3cards_with_hand.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22A2366A1EA5BEE3002CEB16 /* 3cards_with_hand.jpg */; };
 		22AF555A1EA07B0800545402 /* armadillo in Resources */ = {isa = PBXBuildFile; fileRef = 22AF55581EA07B0800545402 /* armadillo */; };
@@ -38,6 +37,17 @@
 		22BA7D3E1EB3C5C5000A7070 /* first_frame.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BA7D3C1EB3C5C5000A7070 /* first_frame.png */; };
 		22BA7D3F1EB3C5C5000A7070 /* second_frame.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BA7D3D1EB3C5C5000A7070 /* second_frame.png */; };
 		22BA7D411EB3C882000A7070 /* third_frame.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BA7D401EB3C882000A7070 /* third_frame.png */; };
+		22CE83C41EB6C00000E465D3 /* dedenne_database.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83BE1EB6C00000E465D3 /* dedenne_database.jpg */; };
+		22CE83C51EB6C00000E465D3 /* dedenne_test1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83BF1EB6C00000E465D3 /* dedenne_test1.jpg */; };
+		22CE83C61EB6C00000E465D3 /* magnemite_test2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83C01EB6C00000E465D3 /* magnemite_test2.jpg */; };
+		22CE83C71EB6C00000E465D3 /* magnemite_database.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83C11EB6C00000E465D3 /* magnemite_database.jpg */; };
+		22CE83C81EB6C00000E465D3 /* magnemite_test1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83C21EB6C00000E465D3 /* magnemite_test1.jpg */; };
+		22CE83C91EB6C00000E465D3 /* two_card_identify.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83C31EB6C00000E465D3 /* two_card_identify.jpg */; };
+		22CE83CC1EB6C0A500E465D3 /* cardIdentify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22CE83CA1EB6C0A500E465D3 /* cardIdentify.cpp */; };
+		22CE83CF1EB6E61B00E465D3 /* magnemite_test1.png in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83CD1EB6E61B00E465D3 /* magnemite_test1.png */; };
+		22CE83D01EB6E61B00E465D3 /* magnemite_test2.png in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83CE1EB6E61B00E465D3 /* magnemite_test2.png */; };
+		22CE83D21EB77CBD00E465D3 /* dedenne_test1.png in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83D11EB77CBD00E465D3 /* dedenne_test1.png */; };
+		22CE83D41EB7C90400E465D3 /* sphere.txt in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83D31EB7C90400E465D3 /* sphere.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,6 +109,18 @@
 		22BA7D3C1EB3C5C5000A7070 /* first_frame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = first_frame.png; sourceTree = "<group>"; };
 		22BA7D3D1EB3C5C5000A7070 /* second_frame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = second_frame.png; sourceTree = "<group>"; };
 		22BA7D401EB3C882000A7070 /* third_frame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = third_frame.png; sourceTree = "<group>"; };
+		22CE83BE1EB6C00000E465D3 /* dedenne_database.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = dedenne_database.jpg; sourceTree = "<group>"; };
+		22CE83BF1EB6C00000E465D3 /* dedenne_test1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = dedenne_test1.jpg; sourceTree = "<group>"; };
+		22CE83C01EB6C00000E465D3 /* magnemite_test2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = magnemite_test2.jpg; sourceTree = "<group>"; };
+		22CE83C11EB6C00000E465D3 /* magnemite_database.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = magnemite_database.jpg; sourceTree = "<group>"; };
+		22CE83C21EB6C00000E465D3 /* magnemite_test1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = magnemite_test1.jpg; sourceTree = "<group>"; };
+		22CE83C31EB6C00000E465D3 /* two_card_identify.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = two_card_identify.jpg; sourceTree = "<group>"; };
+		22CE83CA1EB6C0A500E465D3 /* cardIdentify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cardIdentify.cpp; sourceTree = "<group>"; };
+		22CE83CB1EB6C0A500E465D3 /* cardIdentify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cardIdentify.h; sourceTree = "<group>"; };
+		22CE83CD1EB6E61B00E465D3 /* magnemite_test1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = magnemite_test1.png; sourceTree = "<group>"; };
+		22CE83CE1EB6E61B00E465D3 /* magnemite_test2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = magnemite_test2.png; sourceTree = "<group>"; };
+		22CE83D11EB77CBD00E465D3 /* dedenne_test1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dedenne_test1.png; sourceTree = "<group>"; };
+		22CE83D31EB7C90400E465D3 /* sphere.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sphere.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,12 +128,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				229E02A01EB57BF700B89C91 /* Accelerate.framework in Frameworks */,
 				22AF555D1EA0800100545402 /* CoreMedia.framework in Frameworks */,
 				22791DE21E9AB08B0004EF97 /* AssetsLibrary.framework in Frameworks */,
 				221F36EE1E98934D0036F3C1 /* OpenGLES.framework in Frameworks */,
 				221F36EC1E986B960036F3C1 /* QuartzCore.framework in Frameworks */,
-				221F36E41E984F1D0036F3C1 /* GPUImage.framework in Frameworks */,
-				221F36DC1E9835710036F3C1 /* Accelerate.framework in Frameworks */,
 				221F36DA1E9835650036F3C1 /* opencv2.framework in Frameworks */,
 				221F36D81E9835220036F3C1 /* AVFoundation.framework in Frameworks */,
 			);
@@ -158,6 +179,8 @@
 		221F36A21E9834500036F3C1 /* Virtual_Tumbler */ = {
 			isa = PBXGroup;
 			children = (
+				22CE83CA1EB6C0A500E465D3 /* cardIdentify.cpp */,
+				22CE83CB1EB6C0A500E465D3 /* cardIdentify.h */,
 				223AAD681EAA97F700C20EB9 /* cardTracking.cpp */,
 				223AAD691EAA97F700C20EB9 /* cardTracking.h */,
 				22AF555E1EA111E100545402 /* cardRecognition.cpp */,
@@ -180,6 +203,16 @@
 		221F36A31E9834500036F3C1 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				22CE83D31EB7C90400E465D3 /* sphere.txt */,
+				22CE83D11EB77CBD00E465D3 /* dedenne_test1.png */,
+				22CE83CD1EB6E61B00E465D3 /* magnemite_test1.png */,
+				22CE83CE1EB6E61B00E465D3 /* magnemite_test2.png */,
+				22CE83BE1EB6C00000E465D3 /* dedenne_database.jpg */,
+				22CE83BF1EB6C00000E465D3 /* dedenne_test1.jpg */,
+				22CE83C01EB6C00000E465D3 /* magnemite_test2.jpg */,
+				22CE83C11EB6C00000E465D3 /* magnemite_database.jpg */,
+				22CE83C21EB6C00000E465D3 /* magnemite_test1.jpg */,
+				22CE83C31EB6C00000E465D3 /* two_card_identify.jpg */,
 				22BA7D401EB3C882000A7070 /* third_frame.png */,
 				22BA7D3C1EB3C5C5000A7070 /* first_frame.png */,
 				22BA7D3D1EB3C5C5000A7070 /* second_frame.png */,
@@ -339,19 +372,29 @@
 			buildActionMask = 2147483647;
 			files = (
 				221F36B31E9834500036F3C1 /* LaunchScreen.storyboard in Resources */,
+				22CE83D41EB7C90400E465D3 /* sphere.txt in Resources */,
 				221F36B01E9834500036F3C1 /* Assets.xcassets in Resources */,
 				22BA7D3E1EB3C5C5000A7070 /* first_frame.png in Resources */,
+				22CE83C81EB6C00000E465D3 /* magnemite_test1.jpg in Resources */,
+				22CE83C51EB6C00000E465D3 /* dedenne_test1.jpg in Resources */,
 				221F36F31E991DE80036F3C1 /* image_test_3cards.jpg in Resources */,
+				22CE83D01EB6E61B00E465D3 /* magnemite_test2.png in Resources */,
 				22A2366B1EA5BEE3002CEB16 /* 3cards_half.jpg in Resources */,
 				22A2366C1EA5BEE3002CEB16 /* 3cards_with_hand.jpg in Resources */,
 				221F37761E9949110036F3C1 /* HSV_filter.fsh in Resources */,
+				22CE83C41EB6C00000E465D3 /* dedenne_database.jpg in Resources */,
 				22BA7D411EB3C882000A7070 /* third_frame.png in Resources */,
 				22AF555A1EA07B0800545402 /* armadillo in Resources */,
+				22CE83C91EB6C00000E465D3 /* two_card_identify.jpg in Resources */,
 				221F36AE1E9834500036F3C1 /* Main.storyboard in Resources */,
 				22AF555B1EA07B0800545402 /* armadillo_bits in Resources */,
+				22CE83D21EB77CBD00E465D3 /* dedenne_test1.png in Resources */,
 				223AAD671EAA451000C20EB9 /* image_test_4cards.jpg in Resources */,
 				221F36F41E991DE80036F3C1 /* image_test_many.jpg in Resources */,
+				22CE83C61EB6C00000E465D3 /* magnemite_test2.jpg in Resources */,
+				22CE83C71EB6C00000E465D3 /* magnemite_database.jpg in Resources */,
 				22BA7D3F1EB3C5C5000A7070 /* second_frame.png in Resources */,
+				22CE83CF1EB6E61B00E465D3 /* magnemite_test1.png in Resources */,
 				221F36F21E991DE80036F3C1 /* image_test_1card.jpg in Resources */,
 				221F36F61E991F440036F3C1 /* image_test_3cards_dark.jpg in Resources */,
 			);
@@ -379,6 +422,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				223AAD6A1EAA97F700C20EB9 /* cardTracking.cpp in Sources */,
+				22CE83CC1EB6C0A500E465D3 /* cardIdentify.cpp in Sources */,
 				221F36AB1E9834500036F3C1 /* ViewController.mm in Sources */,
 				221F36A81E9834500036F3C1 /* AppDelegate.m in Sources */,
 				221F36A51E9834500036F3C1 /* main.m in Sources */,
