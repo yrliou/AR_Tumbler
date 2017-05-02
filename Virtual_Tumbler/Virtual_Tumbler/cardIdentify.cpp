@@ -121,11 +121,104 @@ cv::vector<cv::Point2f> Arma2Points2f(arma::fmat &pts)
     return cv_pts; // Return the vector of OpenCV points
 }
 
-cv::vector<std::string>  findcardname(cv::vector<cv::vector<cv::KeyPoint>> keypoints_database, cv::vector<cv::Mat> descriptors_database, cv::Mat grayImage, float TRACK_RESCALE, cv::ORB *orb_detector_){
+cv::vector<int>  findcardname(cv::vector<cv::vector<cv::KeyPoint>> keypoints_database, cv::vector<cv::Mat> descriptors_database, cv::Mat grayImage, float TRACK_RESCALE, cv::ORB *orb_detector_, cv::vector<cv::vector<cv::Point>> card_corners, cv::vector<cv::Mat> &card_homography){
     
-    cv::vector<std::string> cardname;
+    // store homography
+    cv::vector<cv::Mat> cardhomography(card_corners.size());
     
-    return cardname;
+    cv::vector<int> cardnameIndex(card_corners.size());
+    //initialize cardnameIndex
+    for(int i = 0; i < cardnameIndex.size(); i++){
+        cardnameIndex.push_back(-1);
+    }
+    
+    cv::vector<cv::KeyPoint> keypoints_wholeimage;
+    cv::vector<cv::vector<cv::KeyPoint>> keypoints_input(card_corners.size());
+    cv::vector<cv::Mat> descriptors_input;
+    
+    // calculate input keypoints
+    orb_detector_->detect(grayImage, keypoints_wholeimage);
+    
+    cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(20,10,2));
+    cv::vector<cv::DMatch> matches;
+    
+    // store keypoints for input image
+    for(int i = 0; i < keypoints_wholeimage.size(); i++){
+        
+        for(int j = 0; j < card_corners.size(); j++){
+        
+            int checkwithin = cv::pointPolygonTest(card_corners[j], keypoints_wholeimage[i].pt, false);
+            
+            // checkwithin, positive (inside), negative(outside), zero(on an edge)
+            if(checkwithin >=0 ){
+                keypoints_input[j].push_back(keypoints_wholeimage[i]);
+            }
+        }
+    }
+    
+    
+    for(int i = 0; i < keypoints_database.size(); i++){
+    
+        int bestinliner = 0;
+        int tempinliner = 0;
+        int bestindex = -1;
+        cv::Mat besthomography;
+        cv::Mat temphomography;
+        
+        for(int j = 0; j < cardnameIndex.size(); j++){
+            if(cardnameIndex[j] == -1){
+                temphomography = findinlinerhomo(keypoints_database[i], descriptors_database[i], keypoints_input[j], descriptors_input[j], tempinliner, matcher);
+                
+                if(tempinliner > bestinliner){
+                    bestinliner = tempinliner;
+                    besthomography = temphomography;
+                    bestindex = j;
+                }
+            }
+        }
+        
+        if(bestindex > -1){
+            cardnameIndex[bestindex] = i;
+            cardhomography[bestindex] = besthomography;
+        }
+    }
+        
+    card_homography = cardhomography;
+    
+    return cardnameIndex;
+}
+
+cv::Mat findinlinerhomo(std::vector<cv::KeyPoint> keypoints_database, cv::Mat descriptors_database, std::vector<cv::KeyPoint> keypoints_inputimage, cv::Mat descriptors_inputimage, int &inlinernumber, cv::FlannBasedMatcher &matcher){
+    
+    cv::vector<cv::DMatch> matches;
+    matcher.match( descriptors_database, descriptors_inputimage, matches );
+    
+    //-- Localize the object
+    cv::vector<cv::Point2f> databasePoints;
+    cv::vector<cv::Point2f> inputPoints;
+    
+    for( int i = 0; i < matches.size(); i++ )
+    {
+        //-- Get the keypoints from matches
+        databasePoints.push_back( keypoints_database[ matches[i].queryIdx ].pt );
+        inputPoints.push_back( keypoints_inputimage[ matches[i].trainIdx ].pt );
+    }
+    std::cout << "matches numbers " << matches.size() << std::endl;
+    
+    cv::Mat mask;
+    cv::Mat cardsHomography = cv::findHomography( databasePoints, inputPoints, CV_RANSAC, 3, mask);
+    
+    int count_inliner = 0;
+    
+    for(int i = 0; i < mask.rows; i++){
+        if (mask.at<uchar>(i)== 1){
+            count_inliner += 1;
+        }
+    }
+    
+    inlinernumber = count_inliner;
+    
+    return cardsHomography;
 }
 
 cv::Mat homographyinliner( std::vector<cv::KeyPoint> keypoints_database, cv::Mat descriptors_database, cv::Mat card_image , int &inlinernumber, cv::ORB *orb_detector_, cv::Mat &database_image){
