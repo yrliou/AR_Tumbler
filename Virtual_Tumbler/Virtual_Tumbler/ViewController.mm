@@ -294,8 +294,7 @@
     cv::transpose(image, image);
     cv::flip(image, image, 1);
 
-    // show FPS
-    [self showFPS];
+
 
     // show result image
     CGImageRef dstImage;
@@ -342,6 +341,9 @@
     dispatch_sync(dispatch_get_main_queue(), ^{
         drawView_.image = show_image;
     });
+    
+    // show FPS
+    [self showFPS];
     
     //End processing
     CGImageRelease(dstImage);
@@ -417,6 +419,12 @@
     [self.view addSubview:imageView_];
     [self.view.layer addSublayer:previewLayer];
     
+    // setup draw corner layer
+    drawView_ = [[UIImageView alloc] initWithFrame:CGRectMake(0.0, offset, view_width, view_height)];
+    [drawView_ setOpaque:false];
+    [drawView_ setBackgroundColor:[UIColor clearColor]];
+    [self.view addSubview:drawView_];
+    
     // setup fps text
     fpsView_ = [[UITextView alloc] initWithFrame:CGRectMake(0,15,view_width,std::max(offset,35))];
     [fpsView_ setOpaque:false]; // Set to be Opaque
@@ -424,12 +432,6 @@
     [fpsView_ setTextColor:[UIColor redColor]]; // Set text to be RED
     [fpsView_ setFont:[UIFont systemFontOfSize:18]]; // Set the Font size
     [self.view addSubview:fpsView_];
-    
-    // setup draw corner layer
-    drawView_ = [[UIImageView alloc] initWithFrame:CGRectMake(0.0, offset, view_width, view_height)];
-    [drawView_ setOpaque:false];
-    [drawView_ setBackgroundColor:[UIColor clearColor]];
-    [self.view addSubview:drawView_];
 }
 
 - (void) showFPS {
