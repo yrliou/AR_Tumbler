@@ -15,13 +15,19 @@
 #include "cardTracking.h"
 #include "cardIdentify.h"
 
-@interface ViewController (){
+#import <AVFoundation/AVFoundation.h>
+// #include "armadillo"
+
+@interface ViewController () <AVCaptureVideoDataOutputSampleBufferDelegate> {
     // show FPS
     UITextView *fpsView_;
     int64 curr_time_;
     
     // show image
     UIImageView *imageView_;
+    
+    // draw layer
+    UIImageView *drawView_;
     
     // card tracking and recognition
     int card_recognition; // count for going to card recognition
@@ -38,11 +44,15 @@
     cv::vector<cv::vector<cv::KeyPoint>> keypoints_database;
 }
 
+// AVFoundation video
+@property AVCaptureDevice* videoDevice;
+@property AVCaptureSession* captureSession;
+@property AVCaptureVideoDataOutput* captureOutput;
+@property dispatch_queue_t captureSessionQueue;
+
 @end
 
 @implementation ViewController
-
-@synthesize videoCamera;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -84,7 +94,7 @@
     if (VideoStream == 0){
         [self cameraSetup];
         card_recognition = 0;
-        [videoCamera start];
+        [self.captureSession startRunning];
     }
     else if(VideoStream == 1){
         
@@ -363,16 +373,45 @@
     // Dispose of any resources that can be recreated.
 }
 
-// Function to run apply image on
-- (void) processImage:(cv::Mat &)image
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
+    CVImageBufferRef pixelBuffer =
+        CMSampleBufferGetImageBuffer(sampleBuffer);
+    
+    CVPixelBufferLockBaseAddress( pixelBuffer, 0 );
+
+    // check format of frame buffer
+    if (CVPixelBufferGetPixelFormatType(pixelBuffer) != kCVPixelFormatType_32BGRA) {
+        std::cout << "Err: not expected pixel format" << std::endl;
+        CVPixelBufferUnlockBaseAddress( pixelBuffer, 0 );
+        return;
+    }
+
+    int format_opencv = CV_8UC4;
+    void* bufferAddress = CVPixelBufferGetBaseAddress(pixelBuffer);
+    size_t bufferWidth = CVPixelBufferGetWidth(pixelBuffer);
+    size_t bufferHeight = CVPixelBufferGetHeight(pixelBuffer);
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer);
+    
+    CGColorSpaceRef colorSpace;
+    CGContextRef context;
+
+    // NSLog(@"%zi, %zi, %zi", bufferWidth,bufferHeight,bytesPerRow);
+
+    // put frame buffer in open cv Mat, no memory copied
+    cv::Mat bufImg(bufferHeight, bufferWidth, format_opencv, bufferAddress, bytesPerRow);
+
+    // start processing the frame image
+    cv::Mat image = bufImg.clone();
+    // change to BGR
+    cv::cvtColor(image, image, cv::COLOR_BGRA2BGR);
+
     // Card Recognition
     /*
     card_corners = cardRecognition(image);
     [self plotCircle:image points:card_corners];
     */
-    
-    
+
     // blur image before downsampling
     cv::Mat colorImage;
     cv::Mat grayImage;
@@ -405,8 +444,66 @@
         [self plotCircle:image points:card_corners];
     }
     
+    // convert to RGB for displaying
+    cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
+    
+    // rotate for portait mode
+    cv::transpose(image, image);
+    cv::flip(image, image, 1);
+
     // show FPS
     [self showFPS];
+
+    // show result image
+    CGImageRef dstImage;
+    CGBitmapInfo bitmapInfo;
+
+    if (image.channels() == 1) {
+        colorSpace = CGColorSpaceCreateDeviceGray();
+        bitmapInfo = kCGImageAlphaNone;
+    } else if (image.channels() == 3) {
+        colorSpace = CGColorSpaceCreateDeviceRGB();
+        bitmapInfo = kCGImageAlphaNone;
+        bitmapInfo |= kCGBitmapByteOrder32Big;
+        
+    } else {
+        colorSpace = CGColorSpaceCreateDeviceRGB();
+        bitmapInfo = kCGImageAlphaPremultipliedFirst;
+        bitmapInfo |= kCGBitmapByteOrder32Big;
+        
+    }
+    
+    NSData *data = [NSData dataWithBytes:image.data length:image.elemSize()*image.total()];
+    CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)data);
+        
+    // Creating CGImage from cv::Mat
+    dstImage = CGImageCreate(image.cols,                                 // width
+                             image.rows,                                 // height
+                             8,                                          // bits per component
+                             8 * image.elemSize(),                       // bits per pixel
+                             image.step,                                 // bytesPerRow
+                             colorSpace,                                 // colorspace
+                             bitmapInfo,                                 // bitmap info
+                             provider,                                   // CGDataProviderRef
+                             NULL,                                       // decode
+                             false,                                      // should interpolate
+                             kCGRenderingIntentDefault                   // intent
+                             );
+        
+    CGDataProviderRelease(provider);
+
+    UIImage *show_image = [UIImage imageWithCGImage:dstImage];
+    
+    // Have to do this so as to communicate with the main thread
+    // to update the image display
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        drawView_.image = show_image;
+    });
+    
+    //End processing
+    CGImageRelease(dstImage);
+    CGColorSpaceRelease(colorSpace);
+    CVPixelBufferUnlockBaseAddress( pixelBuffer, 0 );
 }
 
 
@@ -431,9 +528,38 @@
 // setup camera and put fps
 - (void) cameraSetup {
     
+    self.captureSession = [[AVCaptureSession alloc] init];
+    AVCaptureVideoPreviewLayer *previewLayer = [AVCaptureVideoPreviewLayer layerWithSession:self.captureSession];
+    previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     
+    self.videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput deviceInputWithDevice:self.videoDevice error:nil];
+
+    self.captureOutput = [[AVCaptureVideoDataOutput alloc] init];
+    self.captureOutput.alwaysDiscardsLateVideoFrames = true;
+    self.captureSessionQueue = dispatch_queue_create("capture_session_queue", NULL);
+    [self.captureOutput setSampleBufferDelegate:self queue:self.captureSessionQueue];
+    
+    // Define the pixel format for the video data output
+    NSString * key = (NSString*)kCVPixelBufferPixelFormatTypeKey;
+    NSNumber * value = [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA];
+    NSDictionary * settings = @{key:value};
+    [self.captureOutput setVideoSettings:settings];
+    
+    [self.captureSession addInput:captureInput];
+    [self.captureSession addOutput:self.captureOutput];
+
+    // float cam_width = 1080; float cam_height = 1920;
     float cam_width = 480; float cam_height = 640;
-    //float cam_width = 720; float cam_height = 1280;
+    // float cam_width = 720; float cam_height = 1280;
+    
+    if (cam_height == 640 && cam_width == 480 &&
+        [self.captureSession canSetSessionPreset:AVCaptureSessionPreset640x480]) {
+        [self.captureSession setSessionPreset:AVCaptureSessionPreset640x480];
+    } else if (cam_height == 1280 && cam_width == 720 &&
+        [self.captureSession canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
+        [self.captureSession setSessionPreset:AVCaptureSessionPreset1280x720];
+    }
     
     // setup frame size
     int view_width = self.view.frame.size.width;
@@ -441,29 +567,12 @@
     int offset = (self.view.frame.size.height - view_height)/2;
     
     imageView_ = [[UIImageView alloc] initWithFrame:CGRectMake(0.0, offset, view_width, view_height)];
+
+    previewLayer.frame = imageView_.bounds;
+    // [imageView_.layer addSublayer:previewLayer];
     
     [self.view addSubview:imageView_];
-    
-    self.videoCamera = [[CvVideoCamera alloc] initWithParentView:imageView_];
-    self.videoCamera.delegate = self;
-    self.videoCamera.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack;
-    self.videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
-    self.videoCamera.defaultFPS = 30; // Set the frame rate
-    self.videoCamera.grayscaleMode = NO; // Get grayscale
-    self.videoCamera.rotateVideo = YES;
-    
-    // choose different camera resolution
-    if (cam_width == 480){
-        self.videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPreset640x480;
-    }
-    else if (cam_width == 720){
-        self.videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPreset1280x720;
-    }
-    else {
-        std::cout << "wrong camera width " << cam_width << "x" << cam_height << std::endl;
-        return;
-    }
-    
+    [self.view.layer addSublayer:previewLayer];
     
     // setup fps text
     fpsView_ = [[UITextView alloc] initWithFrame:CGRectMake(0,15,view_width,std::max(offset,35))];
@@ -473,7 +582,11 @@
     [fpsView_ setFont:[UIFont systemFontOfSize:18]]; // Set the Font size
     [self.view addSubview:fpsView_];
     
-    
+    // setup draw corner layer
+    drawView_ = [[UIImageView alloc] initWithFrame:CGRectMake(0.0, offset, view_width, view_height)];
+    [drawView_ setOpaque:false];
+    [drawView_ setBackgroundColor:[UIColor clearColor]];
+    [self.view addSubview:drawView_];
 }
 
 - (void) showFPS {
