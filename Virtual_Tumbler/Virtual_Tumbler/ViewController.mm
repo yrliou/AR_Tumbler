@@ -42,7 +42,8 @@
     
     cv::vector<cv::vector<cv::KeyPoint>> keypoints_database;
     cv::vector<cv::Mat> descriptors_database;
-    cv::vector<std::string> cardname;
+    cv::vector<int> cardname;
+    cv::vector<cv::Mat> card_homography; 
 }
 
 // AVFoundation video
@@ -60,11 +61,11 @@
     // Do any additional setup after loading the view, typically from a nib.
     
     // Choose which mode
-    //int VideoStream = 0; // Video
+    int VideoStream = 0; // Video
     //int VideoStream = 1; // card Tracking
     //int VideoStream = 2; // card Recognition
     //int VideoStream = 3; // card identify
-    int VideoStream = 4; // card projection
+    //int VideoStream = 4; // card projection
     
     TRACK_RESCALE = 0.50;
     
@@ -462,7 +463,7 @@
     card_corners = cardRecognition(image);
     [self plotCircle:image points:card_corners];
     */
-
+    /*
     // Card Identify
     cv::Mat colorImage;
     cv::Mat grayImage;
@@ -473,10 +474,10 @@
      cv::cvtColor(colorImage, grayImage, cv::COLOR_BGR2GRAY);
     card_corners = cardRecognition(image);
     // card_corners are in the original size
-    cardname = findcardname(keypoints_database, descriptors_database, grayImage, TRACK_RESCALE, orb_detector_);
-    
+    cardname = findcardname(keypoints_database, descriptors_database, grayImage, TRACK_RESCALE, orb_detector_, card_corners, card_homography);
+    */
     // the main function
-    /*
+    
     cv::Mat colorImage;
     cv::Mat grayImage;
     cv::Mat resizeImage;
@@ -507,7 +508,7 @@
         prevImage = grayImage.clone();
         [self plotCircle:image points:card_corners];
     }
-    */
+    
     // convert to RGB for displaying
     cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
     
