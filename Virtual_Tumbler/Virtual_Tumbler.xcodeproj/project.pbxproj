@@ -48,6 +48,10 @@
 		22CE83D01EB6E61B00E465D3 /* magnemite_test2.png in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83CE1EB6E61B00E465D3 /* magnemite_test2.png */; };
 		22CE83D21EB77CBD00E465D3 /* dedenne_test1.png in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83D11EB77CBD00E465D3 /* dedenne_test1.png */; };
 		22CE83D41EB7C90400E465D3 /* sphere.txt in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83D31EB7C90400E465D3 /* sphere.txt */; };
+		DA3C72941EB9359600A226DB /* flaaffy_test1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DA3C72921EB9359600A226DB /* flaaffy_test1.jpg */; };
+		DA3C72951EB9359600A226DB /* flaaffy_database.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DA3C72931EB9359600A226DB /* flaaffy_database.jpg */; };
+		DA3C72981EB9389F00A226DB /* flaaffy_database2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DA3C72961EB9389F00A226DB /* flaaffy_database2.jpg */; };
+		DA3C72991EB9389F00A226DB /* flaaffy_test2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DA3C72971EB9389F00A226DB /* flaaffy_test2.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -121,6 +125,10 @@
 		22CE83CE1EB6E61B00E465D3 /* magnemite_test2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = magnemite_test2.png; sourceTree = "<group>"; };
 		22CE83D11EB77CBD00E465D3 /* dedenne_test1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dedenne_test1.png; sourceTree = "<group>"; };
 		22CE83D31EB7C90400E465D3 /* sphere.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sphere.txt; sourceTree = "<group>"; };
+		DA3C72921EB9359600A226DB /* flaaffy_test1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = flaaffy_test1.jpg; sourceTree = "<group>"; };
+		DA3C72931EB9359600A226DB /* flaaffy_database.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = flaaffy_database.jpg; sourceTree = "<group>"; };
+		DA3C72961EB9389F00A226DB /* flaaffy_database2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = flaaffy_database2.jpg; sourceTree = "<group>"; };
+		DA3C72971EB9389F00A226DB /* flaaffy_test2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = flaaffy_test2.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,6 +212,10 @@
 			isa = PBXGroup;
 			children = (
 				22CE83D31EB7C90400E465D3 /* sphere.txt */,
+				DA3C72921EB9359600A226DB /* flaaffy_test1.jpg */,
+				DA3C72971EB9389F00A226DB /* flaaffy_test2.jpg */,
+				DA3C72931EB9359600A226DB /* flaaffy_database.jpg */,
+				DA3C72961EB9389F00A226DB /* flaaffy_database2.jpg */,
 				22CE83D11EB77CBD00E465D3 /* dedenne_test1.png */,
 				22CE83CD1EB6E61B00E465D3 /* magnemite_test1.png */,
 				22CE83CE1EB6E61B00E465D3 /* magnemite_test2.png */,
@@ -373,9 +385,11 @@
 			files = (
 				221F36B31E9834500036F3C1 /* LaunchScreen.storyboard in Resources */,
 				22CE83D41EB7C90400E465D3 /* sphere.txt in Resources */,
+				DA3C72991EB9389F00A226DB /* flaaffy_test2.jpg in Resources */,
 				221F36B01E9834500036F3C1 /* Assets.xcassets in Resources */,
 				22BA7D3E1EB3C5C5000A7070 /* first_frame.png in Resources */,
 				22CE83C81EB6C00000E465D3 /* magnemite_test1.jpg in Resources */,
+				DA3C72941EB9359600A226DB /* flaaffy_test1.jpg in Resources */,
 				22CE83C51EB6C00000E465D3 /* dedenne_test1.jpg in Resources */,
 				221F36F31E991DE80036F3C1 /* image_test_3cards.jpg in Resources */,
 				22CE83D01EB6E61B00E465D3 /* magnemite_test2.png in Resources */,
@@ -390,6 +404,7 @@
 				22AF555B1EA07B0800545402 /* armadillo_bits in Resources */,
 				22CE83D21EB77CBD00E465D3 /* dedenne_test1.png in Resources */,
 				223AAD671EAA451000C20EB9 /* image_test_4cards.jpg in Resources */,
+				DA3C72951EB9359600A226DB /* flaaffy_database.jpg in Resources */,
 				221F36F41E991DE80036F3C1 /* image_test_many.jpg in Resources */,
 				22CE83C61EB6C00000E465D3 /* magnemite_test2.jpg in Resources */,
 				22CE83C71EB6C00000E465D3 /* magnemite_database.jpg in Resources */,
@@ -397,6 +412,7 @@
 				22CE83CF1EB6E61B00E465D3 /* magnemite_test1.png in Resources */,
 				221F36F21E991DE80036F3C1 /* image_test_1card.jpg in Resources */,
 				221F36F61E991F440036F3C1 /* image_test_3cards_dark.jpg in Resources */,
+				DA3C72981EB9389F00A226DB /* flaaffy_database2.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
