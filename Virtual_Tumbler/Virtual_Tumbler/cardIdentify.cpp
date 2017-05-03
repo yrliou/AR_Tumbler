@@ -121,78 +121,109 @@ cv::vector<cv::Point2f> Arma2Points2f(arma::fmat &pts)
     return cv_pts; // Return the vector of OpenCV points
 }
 
-cv::vector<int>  findcardname(cv::vector<cv::vector<cv::KeyPoint>> keypoints_database, cv::vector<cv::Mat> descriptors_database, cv::Mat grayImage, float TRACK_RESCALE, cv::ORB *orb_detector_, cv::vector<cv::vector<cv::Point>> card_corners, cv::vector<cv::Mat> &card_homography){
-    
-    // store homography
-    cv::vector<cv::Mat> cardhomography(card_corners.size());
-    
-    cv::vector<int> cardnameIndex(card_corners.size());
-    //initialize cardnameIndex
-    for(int i = 0; i < cardnameIndex.size(); i++){
-        cardnameIndex.push_back(-1);
-    }
-    
+void findKeypointsDescriptors(cv::Mat grayImage, cv::ORB *orb_detector_,
+                              cv::vector<cv::vector<cv::Point>> card_corners,
+                              cv::vector<cv::vector<cv::KeyPoint>>& keypoints,
+                              cv::vector<cv::Mat>& descriptors) {
     cv::vector<cv::KeyPoint> keypoints_wholeimage;
-    cv::vector<cv::vector<cv::KeyPoint>> keypoints_input(card_corners.size());
-    cv::vector<cv::Mat> descriptors_input;
-    
-    // calculate input keypoints
     orb_detector_->detect(grayImage, keypoints_wholeimage);
+
+    // for each card
+    for (int i = 0; i < card_corners.size(); i++) {
+        // store keypoints and descriptors
+        for(int j = 0; j < keypoints_wholeimage.size(); j++){
+            // if (cv::pointPolygonTest(card_corners[i], keypoints_wholeimage[j].pt, false) >= 0) {
+                keypoints[i].push_back(keypoints_wholeimage[j]);
+            // }
+        }
+        
+        // store descriptors
+        orb_detector_->compute(grayImage, keypoints[i], descriptors[i]);
+    }
+}
+
+cv::vector<int>  findcardname(cv::vector<cv::vector<cv::KeyPoint>> keypoints_database, cv::vector<cv::Mat> descriptors_database, cv::Mat grayImage, float TRACK_RESCALE, cv::ORB *orb_detector_, cv::vector<cv::vector<cv::Point>> card_corners, cv::vector<cv::Mat> &card_homography){
+
+    cv::vector<int> cardnameIdx(card_corners.size());
+    for (int i = 0; i < cardnameIdx.size(); i++) {
+        cardnameIdx[i] = -1;
+    }
     
+    cv::vector<cv::Mat> card_homos(keypoints_database.size());
+
+    cv::vector<cv::vector<cv::KeyPoint>> keypoints_input(card_corners.size());
+    cv::vector<cv::Mat> descriptors_input(card_corners.size());
+    findKeypointsDescriptors(grayImage, orb_detector_, card_corners, keypoints_input, descriptors_input);
+
+    int cardInlinerThreshold = -1;
     cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(20,10,2));
-    cv::vector<cv::DMatch> matches;
     
-    // store keypoints for input image
-    for(int i = 0; i < keypoints_wholeimage.size(); i++){
-        
-        for(int j = 0; j < card_corners.size(); j++){
-        
-            int checkwithin = cv::pointPolygonTest(card_corners[j], keypoints_wholeimage[i].pt, false);
+    // for each image in the DB, find the one with the most inliners
+    for (int j = 0; j < keypoints_database.size(); j++) {
+        int best_inliner_index = -1;
+        int best_inliner_count = cardInlinerThreshold;
+        cv::Mat bestH;
+        // for each found card
+        for (int i = 0; i < card_corners.size(); i++) {
+            int inliner_count;
             
-            // checkwithin, positive (inside), negative(outside), zero(on an edge)
-            if(checkwithin >=0 ){
-                keypoints_input[j].push_back(keypoints_wholeimage[i]);
+            cv::Mat h = findinlinerhomo(keypoints_database[j], descriptors_database[j], keypoints_input[i], descriptors_input[i], inliner_count, matcher);
+            
+            // std::cout << "j, i" << j << i << std::endl;
+            // std::cout << inliner_count << std::endl;
+            
+            if (inliner_count >= best_inliner_count) {
+                best_inliner_index = j;
+                best_inliner_count = inliner_count;
+                bestH = h;
             }
+        }
+
+        if (best_inliner_index > -1) {
+            // for each set of card corners, save the index for db image
+            cardnameIdx[j] = best_inliner_index;
+            // save H using card_corners sequence
+            card_homos[best_inliner_index] = bestH;
         }
     }
     
-    
-    for(int i = 0; i < keypoints_database.size(); i++){
-    
-        int bestinliner = 0;
-        int tempinliner = 0;
-        int bestindex = -1;
-        cv::Mat besthomography;
-        cv::Mat temphomography;
-        
-        for(int j = 0; j < cardnameIndex.size(); j++){
-            if(cardnameIndex[j] == -1){
-                temphomography = findinlinerhomo(keypoints_database[i], descriptors_database[i], keypoints_input[j], descriptors_input[j], tempinliner, matcher);
-                
-                if(tempinliner > bestinliner){
-                    bestinliner = tempinliner;
-                    besthomography = temphomography;
-                    bestindex = j;
-                }
+    /*
+    // for each set of 4 corners (one card), found the db card with most inliners
+    for (int i = 0; i < card_corners.size(); i++) {
+        // get inliner_count against each image in database
+        // use the one with most inliners, save the index of db image
+        int best_inliner_index = -1;
+        int best_inliner_count = cardInlinerThreshold;
+        cv::Mat bestH;
+        for (int j = 0; j < keypoints_database.size(); j++) {
+            int inliner_count;
+            
+            cv::Mat h = findinlinerhomo(keypoints_database[j], descriptors_database[j], keypoints_input[i], descriptors_input[i], inliner_count, matcher);
+            
+            std::cout << "i,j" << i << j << std::endl;
+            std::cout << inliner_count << std::endl;
+            
+            if (inliner_count >= best_inliner_count) {
+                best_inliner_index = j;
+                best_inliner_count = inliner_count;
+                bestH = h;
             }
         }
         
-        if(bestindex > -1){
-            cardnameIndex[bestindex] = i;
-            cardhomography[bestindex] = besthomography;
+        if (best_inliner_index > -1) {
+            cardnameIdx[i] = best_inliner_index;
+            card_homos[best_inliner_index] = bestH;
         }
     }
-        
-    card_homography = cardhomography;
-    
-    return cardnameIndex;
+    */
+    card_homography = card_homos;
+    return cardnameIdx;
 }
 
 cv::Mat findinlinerhomo(std::vector<cv::KeyPoint> keypoints_database, cv::Mat descriptors_database, std::vector<cv::KeyPoint> keypoints_inputimage, cv::Mat descriptors_inputimage, int &inlinernumber, cv::FlannBasedMatcher &matcher){
     
     cv::vector<cv::DMatch> matches;
     matcher.match( descriptors_database, descriptors_inputimage, matches );
-    
     //-- Localize the object
     cv::vector<cv::Point2f> databasePoints;
     cv::vector<cv::Point2f> inputPoints;

@@ -42,12 +42,17 @@
 		22CE83C61EB6C00000E465D3 /* magnemite_test2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83C01EB6C00000E465D3 /* magnemite_test2.jpg */; };
 		22CE83C71EB6C00000E465D3 /* magnemite_database.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83C11EB6C00000E465D3 /* magnemite_database.jpg */; };
 		22CE83C81EB6C00000E465D3 /* magnemite_test1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83C21EB6C00000E465D3 /* magnemite_test1.jpg */; };
-		22CE83C91EB6C00000E465D3 /* two_card_identify.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83C31EB6C00000E465D3 /* two_card_identify.jpg */; };
+		22CE83C91EB6C00000E465D3 /* two_cards_identify.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83C31EB6C00000E465D3 /* two_cards_identify.jpg */; };
 		22CE83CC1EB6C0A500E465D3 /* cardIdentify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22CE83CA1EB6C0A500E465D3 /* cardIdentify.cpp */; };
 		22CE83CF1EB6E61B00E465D3 /* magnemite_test1.png in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83CD1EB6E61B00E465D3 /* magnemite_test1.png */; };
 		22CE83D01EB6E61B00E465D3 /* magnemite_test2.png in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83CE1EB6E61B00E465D3 /* magnemite_test2.png */; };
 		22CE83D21EB77CBD00E465D3 /* dedenne_test1.png in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83D11EB77CBD00E465D3 /* dedenne_test1.png */; };
 		22CE83D41EB7C90400E465D3 /* sphere.txt in Resources */ = {isa = PBXBuildFile; fileRef = 22CE83D31EB7C90400E465D3 /* sphere.txt */; };
+		DAF351511EB988110008E514 /* flaaffy_database2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DAF3514F1EB988110008E514 /* flaaffy_database2.jpg */; };
+		DAF351521EB988110008E514 /* flaaffy_test2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DAF351501EB988110008E514 /* flaaffy_test2.jpg */; };
+		DAF351541EB98DAE0008E514 /* chespin_database.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DAF351531EB98DAE0008E514 /* chespin_database.jpg */; };
+		DAF351561EB995450008E514 /* chespin_test1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DAF351551EB995450008E514 /* chespin_test1.jpg */; };
+		DAF351581EBA194C0008E514 /* two_cards_identify2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DAF351571EBA194C0008E514 /* two_cards_identify2.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -114,13 +119,18 @@
 		22CE83C01EB6C00000E465D3 /* magnemite_test2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = magnemite_test2.jpg; sourceTree = "<group>"; };
 		22CE83C11EB6C00000E465D3 /* magnemite_database.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = magnemite_database.jpg; sourceTree = "<group>"; };
 		22CE83C21EB6C00000E465D3 /* magnemite_test1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = magnemite_test1.jpg; sourceTree = "<group>"; };
-		22CE83C31EB6C00000E465D3 /* two_card_identify.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = two_card_identify.jpg; sourceTree = "<group>"; };
+		22CE83C31EB6C00000E465D3 /* two_cards_identify.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = two_cards_identify.jpg; sourceTree = "<group>"; };
 		22CE83CA1EB6C0A500E465D3 /* cardIdentify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cardIdentify.cpp; sourceTree = "<group>"; };
 		22CE83CB1EB6C0A500E465D3 /* cardIdentify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cardIdentify.h; sourceTree = "<group>"; };
 		22CE83CD1EB6E61B00E465D3 /* magnemite_test1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = magnemite_test1.png; sourceTree = "<group>"; };
 		22CE83CE1EB6E61B00E465D3 /* magnemite_test2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = magnemite_test2.png; sourceTree = "<group>"; };
 		22CE83D11EB77CBD00E465D3 /* dedenne_test1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dedenne_test1.png; sourceTree = "<group>"; };
 		22CE83D31EB7C90400E465D3 /* sphere.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sphere.txt; sourceTree = "<group>"; };
+		DAF3514F1EB988110008E514 /* flaaffy_database2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = flaaffy_database2.jpg; sourceTree = "<group>"; };
+		DAF351501EB988110008E514 /* flaaffy_test2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = flaaffy_test2.jpg; sourceTree = "<group>"; };
+		DAF351531EB98DAE0008E514 /* chespin_database.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = chespin_database.jpg; sourceTree = "<group>"; };
+		DAF351551EB995450008E514 /* chespin_test1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = chespin_test1.jpg; sourceTree = "<group>"; };
+		DAF351571EBA194C0008E514 /* two_cards_identify2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = two_cards_identify2.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,15 +214,20 @@
 			isa = PBXGroup;
 			children = (
 				22CE83D31EB7C90400E465D3 /* sphere.txt */,
-				22CE83D11EB77CBD00E465D3 /* dedenne_test1.png */,
+				DAF351531EB98DAE0008E514 /* chespin_database.jpg */,
+				DAF351551EB995450008E514 /* chespin_test1.jpg */,
+				DAF3514F1EB988110008E514 /* flaaffy_database2.jpg */,
+				DAF351501EB988110008E514 /* flaaffy_test2.jpg */,
 				22CE83CD1EB6E61B00E465D3 /* magnemite_test1.png */,
 				22CE83CE1EB6E61B00E465D3 /* magnemite_test2.png */,
+				22CE83D11EB77CBD00E465D3 /* dedenne_test1.png */,
 				22CE83BE1EB6C00000E465D3 /* dedenne_database.jpg */,
 				22CE83BF1EB6C00000E465D3 /* dedenne_test1.jpg */,
-				22CE83C01EB6C00000E465D3 /* magnemite_test2.jpg */,
 				22CE83C11EB6C00000E465D3 /* magnemite_database.jpg */,
 				22CE83C21EB6C00000E465D3 /* magnemite_test1.jpg */,
-				22CE83C31EB6C00000E465D3 /* two_card_identify.jpg */,
+				22CE83C01EB6C00000E465D3 /* magnemite_test2.jpg */,
+				22CE83C31EB6C00000E465D3 /* two_cards_identify.jpg */,
+				DAF351571EBA194C0008E514 /* two_cards_identify2.jpg */,
 				22BA7D401EB3C882000A7070 /* third_frame.png */,
 				22BA7D3C1EB3C5C5000A7070 /* first_frame.png */,
 				22BA7D3D1EB3C5C5000A7070 /* second_frame.png */,
@@ -377,21 +392,26 @@
 				22BA7D3E1EB3C5C5000A7070 /* first_frame.png in Resources */,
 				22CE83C81EB6C00000E465D3 /* magnemite_test1.jpg in Resources */,
 				22CE83C51EB6C00000E465D3 /* dedenne_test1.jpg in Resources */,
+				DAF351561EB995450008E514 /* chespin_test1.jpg in Resources */,
 				221F36F31E991DE80036F3C1 /* image_test_3cards.jpg in Resources */,
 				22CE83D01EB6E61B00E465D3 /* magnemite_test2.png in Resources */,
+				DAF351541EB98DAE0008E514 /* chespin_database.jpg in Resources */,
 				22A2366B1EA5BEE3002CEB16 /* 3cards_half.jpg in Resources */,
 				22A2366C1EA5BEE3002CEB16 /* 3cards_with_hand.jpg in Resources */,
 				221F37761E9949110036F3C1 /* HSV_filter.fsh in Resources */,
 				22CE83C41EB6C00000E465D3 /* dedenne_database.jpg in Resources */,
 				22BA7D411EB3C882000A7070 /* third_frame.png in Resources */,
 				22AF555A1EA07B0800545402 /* armadillo in Resources */,
-				22CE83C91EB6C00000E465D3 /* two_card_identify.jpg in Resources */,
+				22CE83C91EB6C00000E465D3 /* two_cards_identify.jpg in Resources */,
 				221F36AE1E9834500036F3C1 /* Main.storyboard in Resources */,
 				22AF555B1EA07B0800545402 /* armadillo_bits in Resources */,
+				DAF351511EB988110008E514 /* flaaffy_database2.jpg in Resources */,
 				22CE83D21EB77CBD00E465D3 /* dedenne_test1.png in Resources */,
 				223AAD671EAA451000C20EB9 /* image_test_4cards.jpg in Resources */,
 				221F36F41E991DE80036F3C1 /* image_test_many.jpg in Resources */,
 				22CE83C61EB6C00000E465D3 /* magnemite_test2.jpg in Resources */,
+				DAF351521EB988110008E514 /* flaaffy_test2.jpg in Resources */,
+				DAF351581EBA194C0008E514 /* two_cards_identify2.jpg in Resources */,
 				22CE83C71EB6C00000E465D3 /* magnemite_database.jpg in Resources */,
 				22BA7D3F1EB3C5C5000A7070 /* second_frame.png in Resources */,
 				22CE83CF1EB6E61B00E465D3 /* magnemite_test1.png in Resources */,
