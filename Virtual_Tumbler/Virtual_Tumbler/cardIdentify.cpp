@@ -18,11 +18,24 @@ void projectImageTest(cv::Mat &firstframe, cv::Mat &secondframe, cv::ORB *orb_de
     
     
     arma::fmat K;
-    /*
+    
     K << 3043.72 <<       0 << 1196 << arma::endr
     <<       0 << 3043.72 << 1604 << arma::endr
     <<       0 <<    0    <<    1;
-    */
+    
+    
+    arma::fmat Ht;
+    
+    Ht << -7.1717e-02 << 1.8066e-02 << -5.1062e-01 << arma::endr
+    << 1.3230e-03 <<-2.0742e-02 <<-8.5637e-01<< arma::endr
+    << -4.5728e-07<< 1.7184e-05 <<-1.0572e-03;
+    arma::fmat Rt;
+    arma::fmat tt;
+    myfit_extrinsic(Ht, K, Rt, tt);
+    
+    std::cout << "H=" << Ht <<std::endl;
+    std::cout << "R=" << Rt <<std::endl;
+    std::cout << "t=" << tt <<std::endl;
     
         // Set camera intrinsic
         K << 1899.4 <<       0 << 978.3 << arma::endr
@@ -190,11 +203,25 @@ void projectImageTest(cv::Mat &firstframe, cv::Mat &secondframe, cv::BRISK *bris
     
     
     arma::fmat K;
-    /*
+    
      K << 3043.72 <<       0 << 1196 << arma::endr
      <<       0 << 3043.72 << 1604 << arma::endr
      <<       0 <<    0    <<    1;
-     */
+    
+    arma::fmat Ht;
+    
+    Ht << -7.1717e-02 << 1.8066e-02 << -5.1062e-01 << arma::endr
+    << 1.3230e-03 <<-2.0742e-02 <<-8.5637e-01<< arma::endr
+    << -4.5728e-07<< 1.7184e-05 <<-1.0572e-03;
+    arma::fmat Rt;
+    arma::fmat tt;
+    myfit_extrinsic(Ht, K, Rt, tt);
+    
+    std::cout << "H=" << Ht <<std::endl;
+    std::cout << "R=" << Rt <<std::endl;
+    std::cout << "t=" << tt <<std::endl;
+    
+    
     
     // Set camera intrinsic
     K << 1899.4 <<       0 << 978.3 << arma::endr
