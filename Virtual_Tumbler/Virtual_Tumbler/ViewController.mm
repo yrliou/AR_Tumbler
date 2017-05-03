@@ -61,11 +61,11 @@
     // Do any additional setup after loading the view, typically from a nib.
     
     // Choose which mode
-    int VideoStream = 0; // Video
+    //int VideoStream = 0; // Video
     //int VideoStream = 1; // card Tracking
     //int VideoStream = 2; // card Recognition
-    // int VideoStream = 3; // card identify
-    //int VideoStream = 4; // card projection
+    //int VideoStream = 3; // card identify
+    int VideoStream = 4; // card projection
     
     TRACK_RESCALE = 0.50;
     
@@ -393,25 +393,38 @@
         UIImage *second_frame = [UIImage imageNamed:@"second_frame.png"];
         if(second_frame == nil) std::cout << "Cannot read in the file second_frame.png!!" << std::endl;
         
+        UIImage *magnemite_database = [UIImage imageNamed:@"magnemite_database.jpg"];
+        if(magnemite_database == nil) std::cout << "Cannot read in the magnemite_database.jpg!!" << std::endl;
+        
+        UIImage *magnemite_test2 = [UIImage imageNamed:@"magnemite_test2.jpg"];
+        if(magnemite_test2 == nil) std::cout << "Cannot read in the magnemite_test2.jpg!!" << std::endl;
+        
         // transfer to Mat from UIImage
         cv::Mat firstframe = [self cvMatFromUIImage:first_frame];
         cv::cvtColor(firstframe, firstframe, CV_RGB2BGR);
         
         cv::Mat secondframe = [self cvMatFromUIImage:second_frame];
         cv::cvtColor(secondframe, secondframe, CV_RGB2BGR);
+        
+        cv::Mat magnemitedatabase = [self cvMatFromUIImage:magnemite_database];
+        cv::cvtColor(magnemitedatabase, magnemitedatabase, CV_RGB2BGR);
+        
+        cv::Mat magnemitetest2 = [self cvMatFromUIImage:magnemite_test2];
+        cv::cvtColor(magnemitetest2, magnemitetest2, CV_RGB2BGR);
     
         [self showImage:first_frame];
         
         // projectiont
         NSString *str = [[NSBundle mainBundle] pathForResource:@"sphere" ofType:@"txt"];
         const char *SphereName = [str UTF8String];
-        projectImageTest(firstframe, secondframe, orb_detector_, SphereName);
+        projectImageTest(firstframe, secondframe, orb_detector_, SphereName, magnemitedatabase, magnemitetest2);
         
-        
+        cv::cvtColor(magnemitedatabase, magnemitedatabase, CV_BGR2RGB);
+        cv::cvtColor(magnemitetest2, magnemitetest2, CV_BGR2RGB);
         cv::cvtColor(firstframe, firstframe, CV_BGR2RGB);
         cv::cvtColor(secondframe, secondframe, CV_BGR2RGB);
         
-        imageView_.image = [self UIImageFromCVMat:firstframe];
+        imageView_.image = [self UIImageFromCVMat:secondframe];
     }
 }
 
@@ -510,6 +523,25 @@
     cv::resize(resizeImage, colorImage, cv::Size(), TRACK_RESCALE, TRACK_RESCALE);
      cv::cvtColor(colorImage, grayImage, cv::COLOR_BGR2GRAY);
 
+/*
+    float PRORESCALE = 1.0;
+    cv::resize(resizeImage, colorImage, cv::Size(), PRORESCALE, PRORESCALE);
+    cv::cvtColor(colorImage, grayImage, cv::COLOR_BGR2GRAY);
+    card_corners = cardRecognition(image);
+    
+    NSString *str = [[NSBundle mainBundle] pathForResource:@"sphere" ofType:@"txt"];
+    const char *SphereName = [str UTF8String];
+    
+    if(card_recognition == 0){
+        prevImage = grayImage.clone();
+        card_recognition += 1;
+    }
+    else{
+        projectModel(prevImage, grayImage, image, card_corners, orb_detector_, PRORESCALE, SphereName);
+        prevImage = grayImage.clone();
+    }
+*/  
+    
     if(card_recognition < 60){
         card_corners = cardRecognition(image);
         
@@ -540,6 +572,8 @@
         prevImage = grayImage.clone();
         [self plotCircle:image points:card_corners];
     }
+
+    //************************************************ end of processing image
     
     // draw corners
     [self plotCircle:image points:card_corners];
