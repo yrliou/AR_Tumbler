@@ -126,7 +126,6 @@
             return;
         }
         
-        
         UIImage *inputImageFirst = first_frame;
         // set the ImageView_ for still image
         [self showImage:inputImageFirst];
@@ -346,31 +345,70 @@
         // card projection test
         std::cout << "card projection" << std::endl;
         
-        UIImage *first_frame = [UIImage imageNamed:@"first_frame.png"];
-        if(first_frame == nil) std::cout << "Cannot read in the file first_frame.png!!" << std::endl;
+        // UIImage *first_frame = [UIImage imageNamed:@"first_frame.png"];
+        // if(first_frame == nil) std::cout << "Cannot read in the file first_frame.png!!" << std::endl;
         
-        UIImage *second_frame = [UIImage imageNamed:@"second_frame.png"];
+        // UIImage *second_frame = [UIImage imageNamed:@"second_frame.png"];
+        // if(second_frame == nil) std::cout << "Cannot read in the file second_frame.png!!" << std::endl;
+        
+        UIImage *first_frame = [UIImage imageNamed:@"dedenne_database.jpg"];
+         if(first_frame == nil) std::cout << "Cannot read in the file first_frame.png!!" << std::endl;
+        
+        // UIImage *second_frame = [UIImage imageNamed:@"dedenne_database.jpg"];
+        // if(second_frame == nil) std::cout << "Cannot read in the file first_frame.png!!" << std::endl;
+        
+        UIImage *second_frame = [UIImage imageNamed:@"dedenne_test1.jpg"];
         if(second_frame == nil) std::cout << "Cannot read in the file second_frame.png!!" << std::endl;
         
-        // transfer to Mat from UIImage
+        // UIImage *first_frame = [UIImage imageNamed:@"flaaffy_database2.jpg"];
+        // if(first_frame == nil) std::cout << "Cannot read in the file first_frame.png!!" << std::endl;
+        
+        // UIImage *second_frame = [UIImage imageNamed:@"flaaffy_test2.jpg"];
+        // if(second_frame == nil) std::cout << "Cannot read in the file first_frame.png!!" << std::endl;
+        
         cv::Mat firstframe = [self cvMatFromUIImage:first_frame];
-        cv::cvtColor(firstframe, firstframe, CV_RGB2BGR);
+        // cv::transpose(firstframe, firstframe);
+        // cv::flip(firstframe, firstframe, 1);
         
         cv::Mat secondframe = [self cvMatFromUIImage:second_frame];
-        cv::cvtColor(secondframe, secondframe, CV_RGB2BGR);
-    
-        [self showImage:first_frame];
+        // cv::transpose(secondframe, secondframe);
+        // cv::flip(secondframe, secondframe, 1);
+        // process image
         
-        // projectiont
+
+        // transfer to Mat from UIImage
+        // cv::Mat firstframe = [self cvMatFromUIImage:first_frame];
+        cv::cvtColor(firstframe, firstframe, CV_RGB2BGR);
+        
+        // cv::Mat secondframe = [self cvMatFromUIImage:second_frame];
+        cv::cvtColor(secondframe, secondframe, CV_RGB2BGR);
+        
+        cv::Mat secondGrayImage = secondframe.clone();
+        // cv::cvtColor(secondGrayImage, secondGrayImage, CV_BGR2GRAY);
+        
+        cv::vector<cv::vector<cv::Point>> card_corners;
+        card_corners = cardRecognition(secondGrayImage);
+    
+        // [self showImage:first_frame];
+        [self showImage:second_frame];
+        
+        // projection
         NSString *str = [[NSBundle mainBundle] pathForResource:@"sphere" ofType:@"txt"];
         const char *SphereName = [str UTF8String];
-        projectImageTest(firstframe, secondframe, orb_detector_, SphereName);
+        projectImageTest(firstframe, secondframe, orb_detector_, SphereName, card_corners);
         
         
         cv::cvtColor(firstframe, firstframe, CV_BGR2RGB);
         cv::cvtColor(secondframe, secondframe, CV_BGR2RGB);
+        [self plotCircle:secondframe points:card_corners];
         
-        imageView_.image = [self UIImageFromCVMat:firstframe];
+        cv::transpose(secondframe, secondframe);
+        cv::flip(secondframe, secondframe, 1);
+        // imageView_.image = [self UIImageFromCVMat:firstframe];
+        imageView_.image = [self UIImageFromCVMat:secondframe];
+
+//        [self showImage:first_frame];
+//        imageView_.image = [self UIImageFromCVMat:firstframe];
     }
 }
 
