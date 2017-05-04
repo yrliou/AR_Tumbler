@@ -77,52 +77,7 @@ void projectModel(cv::Mat &prevImag, cv::Mat &grayImage, cv::Mat &image, cv::vec
 }
 
 void projectImageTest(cv::Mat &firstframe, cv::Mat &secondframe, cv::ORB *orb_detector_, const char *model3dname, cv::Mat &magnemitedatabase, cv::Mat &magnemitetest2){
-    // Get parameters
-    /*
-    arma::fmat Omega;
-    Omega << -0.9994 << -0.0344 << 0.0079 << arma::endr
-    << 0.0292  << -0.6781 << 0.7344 << arma::endr
-    << -0.0199 <<  0.7342 << 0.6787 << arma::endr;
     
-    arma::fmat Tau;
-    Tau << -10.6096 << arma::endr
-    << -11.8144 << arma::endr
-    << 45.2894 << arma::endr;
-    
-    Tau.at(0,0) += 3;
-    Tau.at(1,0) -= 2;
-    */
-    /*
-    // test code correctness ********************
-    arma::fmat K;
-    K << 3043.72 <<       0 << 1196 << arma::endr
-    <<       0 << 3043.72 << 1604 << arma::endr
-    <<       0 <<    0    <<    1;
-    
-    arma::fmat W;
-    W << 0.0 << 18.2 << 18.2 <<  0.0 << arma::endr
-    << 0.0 <<  0.0 << 26.0 << 26.0 << arma::endr
-    << 0.0 <<  0.0 <<  0.0 << 0.0;
-    // Corresponding 2D projected points of the book in the image
-    arma::fmat X;
-    X << 483 << 1704 << 2175 <<  67 << arma::endr
-    << 810 <<  781 << 2217 << 2286;
-    
-    arma::fmat H;
-    H << -7.1717e-02 << 1.8066e-02 << -5.1062e-01 << arma::endr
-    << 1.3230e-03 <<-2.0742e-02 << -8.5637e-01 << arma::endr
-    << -4.5728e-07 << 1.7184e-05 << -1.0572e-03;
-    
-    arma::fmat R;
-    arma::fmat t;
-    myfit_extrinsic(H, K, R, t);
-    std::cout << "H\n"<< H << std::endl;
-    std::cout << "K\n" << K << std::endl;
-    std::cout << "R\n" << R << std::endl;
-    std::cout << "t\n" << t << std::endl;
-    
-    // end test code correctness ****************
-     */
     
     // read reference image
     arma::fmat ipodK;
@@ -141,23 +96,11 @@ void projectImageTest(cv::Mat &firstframe, cv::Mat &secondframe, cv::ORB *orb_de
     << -4.5728e-07 << 1.7184e-05 << -1.0572e-03;
     
     arma::fmat sphere; sphere.load(model3dname);
-    arma::fmat identity;
-    identity = arma::eye<arma::fmat>(3,3);
-    arma::fmat R_template;
-    arma::fmat t_template;
-    
-    myfit_extrinsic(H, ipodK, R_template, t_template);
-    
-    //std::cout << "H\n"<< identity << std::endl;
-    std::cout << "K\n" << ipodK << std::endl;
-    std::cout << "R\n" << R_template << std::endl;
-    std::cout << "t\n" << t_template << std::endl;
-    // the identity matrix cause t_template, [nan;nan;nan]
-    arma::fmat pts_2d = myproj_extrinsic(sphere, ipodK, R_template, t_template);
-    
-    const cv::Scalar YELLOW = cv::Scalar(255,255,0);
-    cv::Mat cvImage = DrawPts(firstframe, pts_2d, YELLOW);
-    
+    arma::fmat z_offset;
+    z_offset << 0 << arma::endr << 0 << arma::endr << 3.4290;
+    arma::fmat xy_offset;
+    xy_offset << 320 << arma::endr << 640 << arma::endr << 0;
+    sphere = (sphere + repmat(z_offset, 1, 961))*20 + repmat(xy_offset, 1, 961);
     
     //find homography
     //gray image
@@ -205,6 +148,17 @@ void projectImageTest(cv::Mat &firstframe, cv::Mat &secondframe, cv::ORB *orb_de
     
     std::cout << "projection inliner numbers " << count_inliner << std::endl;
     //std::cout << "homography\n" << cardsHomography << std::endl;
+    std::vector<cv::DMatch> inlinerMatch;
+    for (size_t i = 0; i < mask.rows; ++i) {
+        uchar *inliner = mask.ptr<uchar>(i);
+        if (inliner[0] == 1) {
+            inlinerMatch.push_back(matches[i]);
+        }
+    }
+    drawMatches( firstframe, keypoints_first, grayinput, keypoints_inputimage,
+                matches, img_matches, cv::Scalar::all(-1), cv::Scalar::all(-1),
+                cv::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+    
     
     // cv::mat(row major) to arma::mat (column major),
     cv::transpose(cardsHomography, cardsHomography);
@@ -219,13 +173,14 @@ void projectImageTest(cv::Mat &firstframe, cv::Mat &secondframe, cv::ORB *orb_de
     arma::fmat R_homo;
     arma::fmat t_homo;
     
-    arma::fmat secondhomo = arma_homo_fmat * H;
+    //arma::fmat secondhomo = arma_homo_fmat * H;
     
-    myfit_extrinsic(secondhomo, ipodK, R_homo, t_homo);
-    pts_2d = myproj_extrinsic(sphere, ipodK, R_homo, t_homo);
+    myfit_extrinsic(arma_homo_fmat, ipodK, R_homo, t_homo);
+    arma::fmat pts_2d = myproj_extrinsic(sphere, ipodK, R_homo, t_homo);
     
+    const cv::Scalar YELLOW = cv::Scalar(255,255,0);
     cv::Mat cvImage2 = DrawPts(secondframe, pts_2d, YELLOW);
-    
+    std::cout << "Result\n" << pts_2d << std::endl;
     
 }
 
@@ -305,7 +260,7 @@ cv::Mat DrawPts(cv::Mat &display_im, arma::fmat &pts, const cv::Scalar &pts_clr)
 {
     cv::vector<cv::Point2f> cv_pts = Arma2Points2f(pts); // Convert to vector of Point2fs
     for(int i=0; i<cv_pts.size(); i++) {
-        cv::circle(display_im, cv_pts[i], 1, pts_clr,1); // Draw the points
+        cv::circle(display_im, cv_pts[i], 5, pts_clr,5); // Draw the points
     }
     return display_im; // Return the display image
 }

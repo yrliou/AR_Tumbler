@@ -345,6 +345,7 @@
     }
     else{
         // card projection test
+        /*
         std::cout << "card projection" << std::endl;
         
         UIImage *first_frame = [UIImage imageNamed:@"first_frame.png"];
@@ -385,6 +386,49 @@
         cv::cvtColor(secondframe, secondframe, CV_BGR2RGB);
         
         imageView_.image = [self UIImageFromCVMat:secondframe];
+         */
+        
+        std::cout << "card projection" << std::endl;
+        
+        UIImage *magnemite_database = [UIImage imageNamed:@"magnemite_database.jpg"];
+        if(magnemite_database == nil) std::cout << "Cannot read in the file first_frame.png!!" << std::endl;
+        
+        UIImage *magnemite_test1 = [UIImage imageNamed:@"magnemite_test2.jpg"];
+        if(magnemite_test1 == nil) std::cout << "Cannot read in the file second_frame.png!!" << std::endl;
+        
+        UIImage *magnemite_test2 = [UIImage imageNamed:@"magnemite_test1.jpg"];
+        if(magnemite_test2 == nil) std::cout << "Cannot read in the magnemite_database.jpg!!" << std::endl;
+        
+        UIImage *magnemite_database2 = [UIImage imageNamed:@"magnemite_test2.png"];
+        if(magnemite_database2 == nil) std::cout << "Cannot read in the magnemite_test2.jpg!!" << std::endl;
+        
+        // transfer to Mat from UIImage
+        cv::Mat magnemitedatabase = [self cvMatFromUIImage:magnemite_database];
+        cv::cvtColor(magnemitedatabase, magnemitedatabase, CV_RGB2BGR);
+        
+        cv::Mat magnemitetest1 = [self cvMatFromUIImage:magnemite_test1];
+        cv::cvtColor(magnemitetest1, magnemitetest1, CV_RGB2BGR);
+        
+        cv::Mat magnemitetest2 = [self cvMatFromUIImage:magnemite_test2];
+        cv::cvtColor(magnemitetest2, magnemitetest2, CV_RGB2BGR);
+        
+        cv::Mat magnemitedatabase2 = [self cvMatFromUIImage:magnemite_database2];
+        cv::cvtColor(magnemitedatabase2, magnemitedatabase2, CV_RGB2BGR);
+        
+        [self showImage:magnemite_test1];
+        
+        // projectiont
+        NSString *str = [[NSBundle mainBundle] pathForResource:@"sphere" ofType:@"txt"];
+        const char *SphereName = [str UTF8String];
+        projectImageTest(magnemitedatabase, magnemitetest1, orb_detector_, SphereName, magnemitedatabase, magnemitedatabase2);
+        
+        cv::cvtColor(magnemitedatabase, magnemitedatabase, CV_BGR2RGB);
+        cv::cvtColor(magnemitetest1, magnemitetest1, CV_BGR2RGB);
+        cv::cvtColor(magnemitetest2, magnemitetest2, CV_BGR2RGB);
+        cv::cvtColor(magnemitedatabase2, magnemitedatabase2, CV_BGR2RGB);
+        
+        imageView_.image = [self UIImageFromCVMat:magnemitetest1];
+        
     }
 }
 
