@@ -14,7 +14,7 @@
 #include "cardRecognition.h"
 #include "cardTracking.h"
 #import <AVFoundation/AVFoundation.h>
-// #include "armadillo"
+#include "armadillo"
 #include "cardIdentify.h"
 
 @interface ViewController () <AVCaptureVideoDataOutputSampleBufferDelegate> {
@@ -44,6 +44,11 @@
     cv::vector<cv::Mat> descriptors_database_;
     cv::vector<int> cardname_;
     cv::vector<cv::Mat> card_homography_;
+    cv::vector<cv::Scalar> card_color;
+    arma::fmat cameraK;
+    
+    cv::vector<arma::fmat> model3D;
+    
 }
 
 // AVFoundation video
@@ -61,11 +66,11 @@
     // Do any additional setup after loading the view, typically from a nib.
     
     // Choose which mode
-    //int VideoStream = 0; // Video
+    int VideoStream = 0; // Video
     //int VideoStream = 1; // card Tracking
     //int VideoStream = 2; // card Recognition
     //int VideoStream = 3; // card identify
-    int VideoStream = 4; // card projection
+    //int VideoStream = 4; // card projection
     
     TRACK_RESCALE = 0.50;
     
@@ -460,6 +465,9 @@
     
     float DATABASERESCALE = 0.5;
     
+    // initialize color
+    cv::RNG rng(12345);
+    
     for (int i = 0; i < databaseImgs.size(); i++) {
         // transfer to Mat from UIImage
         References[i] = [self cvMatFromUIImage:databaseImgs[i]];
@@ -475,6 +483,25 @@
         
         keypoints_database_.push_back(keypoints[i]);
         descriptors_database_.push_back(descriptors[i]);
+        
+        // card_color
+        card_color.push_back(cv::Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) ));
+    }
+    
+    // cameraK
+    
+    cameraK<< 1899.4 << 0       << 978.3 << arma::endr
+    << 0      << 1897.5  << 549.7 << arma::endr
+    << 0      << 0       << 1     ;
+    
+    
+    // 3D model currently only one
+    NSString *str = [[NSBundle mainBundle] pathForResource:@"sphere" ofType:@"txt"];
+    const char *SphereName = [str UTF8String];
+    arma::fmat sphere; sphere.load(SphereName);
+    
+    for(int i = 0; i < databaseImgs.size(); i++){
+        model3D.push_back(sphere);
     }
 }
 
@@ -540,7 +567,8 @@
         projectModel(prevImage, grayImage, image, card_corners, orb_detector_, PRORESCALE, SphereName);
         prevImage = grayImage.clone();
     }
-*/  
+*/
+    //************************************************ start of processing image
     
     if(card_recognition < 60){
         card_corners = cardRecognition(image);
@@ -556,7 +584,7 @@
         prevImage = grayImage.clone();
         
         //plot circle
-        [self plotCircle:image points:card_corners];
+        //[self plotCircle:image points:card_corners];
         
         card_recognition += 1;
     } else{
@@ -569,15 +597,17 @@
         cardAllFindhomography(prevImage, grayImage, card_corners, TRACK_RESCALE, brisk_detector_);
         trackingCorner(colorImage, card_corners, image, TRACK_RESCALE);
         
+        // projection on card
+        projectionCard(card_homography_, card_color, model3D, cameraK, TRACK_RESCALE, card_corners, image, cardname_);
+        
         prevImage = grayImage.clone();
-        [self plotCircle:image points:card_corners];
+        //[self plotCircle:image points:card_corners];
     }
-
+    // draw corners
+    //[self plotCircle:image points:card_corners];
+    
     //************************************************ end of processing image
     
-    // draw corners
-    [self plotCircle:image points:card_corners];
-     
     // convert to RGB for displaying
     cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
     
@@ -585,7 +615,6 @@
     cv::transpose(image, image);
     cv::flip(image, image, 1);
 
-    //************************************************ end of processing image
     
     // show result image
     CGImageRef dstImage;

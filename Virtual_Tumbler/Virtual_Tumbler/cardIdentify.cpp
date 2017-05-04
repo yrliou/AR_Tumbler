@@ -3,6 +3,58 @@
 #include <iostream>
 #include <algorithm>    // std::cout
 
+void projectionCard(cv::vector<cv::Mat> &card_homography_, cv::vector<cv::Scalar> card_color, cv::vector<arma::fmat>model3D, arma::fmat cameraK, float TRACK_RESCALE, cv::vector<cv::vector<cv::Point>> card_corners, cv::Mat &image, cv::vector<int> cardname_){
+    
+    arma::fmat H;
+    H << -7.1717e-02 << 1.8066e-02 << -5.1062e-01 << arma::endr
+    << 1.3230e-03 <<-2.0742e-02 << -8.5637e-01 << arma::endr
+    << -4.5728e-07 << 1.7184e-05 << -1.0572e-03;
+    
+    for(int i = 0; i < cardname_.size(); i++){
+        // get model
+        arma::fmat model = model3D[cardname_[i]];
+        arma::fmat R;
+        arma::fmat t;
+        const cv::Scalar color = card_color[cardname_[i]];
+        
+        // get 2d points
+        myfit_extrinsic(H, cameraK, R, t);
+        arma::fmat pts_2d = myproj_extrinsic(model, cameraK, R, t);
+        
+        // find card center
+        cv::Point2f cardcenter(0,0);
+        for(int j = 0; j < card_corners[i].size(); j++){
+            cardcenter.x += card_corners[i][j].x;
+            cardcenter.y += card_corners[i][j].y;
+        }
+        cardcenter.x /= 4;
+        cardcenter.y /= 4;
+        
+        // make sphere smaller
+        //pts_2d *= 1/2;
+        
+        // shift to card center
+        // for sphere model the loweast point is in the index 0
+        float shift_x_value = cardcenter.x - pts_2d[0,0];
+        float shift_y_value = cardcenter.y - pts_2d[1,0] - 350;
+        
+        arma::fmat shift_value;
+        shift_value << shift_x_value << arma::endr << shift_y_value;
+        
+        pts_2d =pts_2d + arma::repmat(shift_value, 1, pts_2d.n_cols);
+        
+        //std::cout << "card index i is " << i << std::endl;
+        //std::cout << "card corners\n" << card_corners[i] << std::endl;
+        //std::cout << "card center\n" << cardcenter << std::endl;
+        
+        //cv::circle(image, cardcenter, 10, color, 5, 10, 0);
+        
+        cv::Mat cvImage = DrawPts(image, pts_2d, color);
+        
+    }
+    
+}
+
 void projectModel(cv::Mat &prevImag, cv::Mat &grayImage, cv::Mat &image, cv::vector<cv::vector<cv::Point>> card_corners, cv::ORB *orb_detector_, float PRORESCALE, const char *model3dname){
     
     arma::fmat sphere; sphere.load(model3dname);
@@ -43,7 +95,7 @@ void projectModel(cv::Mat &prevImag, cv::Mat &grayImage, cv::Mat &image, cv::vec
         firstPoints.push_back( keypoints_prev[ matches[i].queryIdx ].pt );
         secondPoints.push_back( keypoints_curr[ matches[i].trainIdx ].pt );
     }
-    std::cout << "matches numbers " << matches.size() << std::endl;
+    //std::cout << "matches numbers " << matches.size() << std::endl;
     
     cv::Mat mask;
     cv::Mat cardsHomography = cv::findHomography( firstPoints, secondPoints, CV_RANSAC, 3, mask);
@@ -191,7 +243,7 @@ void projectImageTest(cv::Mat &firstframe, cv::Mat &secondframe, cv::ORB *orb_de
         firstPoints.push_back( keypoints_first[ matches[i].queryIdx ].pt );
         secondPoints.push_back( keypoints_second[ matches[i].trainIdx ].pt );
     }
-    std::cout << "matches numbers " << matches.size() << std::endl;
+    //std::cout << "matches numbers " << matches.size() << std::endl;
     
     cv::Mat mask;
     cv::Mat cardsHomography = cv::findHomography( firstPoints, secondPoints, CV_RANSAC, 3, mask);
@@ -432,7 +484,7 @@ cv::Mat findinlinerhomo(std::vector<cv::KeyPoint> keypoints_database, cv::Mat de
         databasePoints.push_back( keypoints_database[ matches[i].queryIdx ].pt );
         inputPoints.push_back( keypoints_inputimage[ matches[i].trainIdx ].pt );
     }
-    std::cout << "matches numbers " << matches.size() << std::endl;
+    //std::cout << "matches numbers " << matches.size() << std::endl;
     
     cv::Mat mask;
     cv::Mat cardsHomography = cv::findHomography( databasePoints, inputPoints, CV_RANSAC, 3, mask);
@@ -481,7 +533,7 @@ cv::Mat homographyinliner( std::vector<cv::KeyPoint> keypoints_database, cv::Mat
         databasePoints.push_back( keypoints_database[ matches[i].queryIdx ].pt );
         inputPoints.push_back( keypoints_inputimage[ matches[i].trainIdx ].pt );
     }
-    std::cout << "matches numbers " << matches.size() << std::endl;
+    //std::cout << "matches numbers " << matches.size() << std::endl;
     
     //cv::vector<uchar> mask(matches.size());
     cv::Mat mask;
