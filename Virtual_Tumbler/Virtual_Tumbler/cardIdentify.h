@@ -9,6 +9,8 @@
 
 cv::Mat homographyinliner( std::vector<cv::KeyPoint> keypoints_database, cv::Mat descriptors_database, cv::Mat card_image , int &inlinernumber, cv::ORB *orb_detector_, cv::Mat &database_image);
 
+void projectionCard(cv::vector<cv::Mat> &card_homography_, cv::vector<cv::Scalar> card_color, cv::vector<arma::fmat>model3D, arma::fmat cameraK, float TRACK_RESCALE, cv::vector<cv::vector<cv::Point>> card_corners, cv::Mat &image, cv::vector<int> cardname_);
+
 //cv::Mat homographyinliner( std::vector<cv::KeyPoint> keypoints_database, cv::Mat descriptors_database, cv::Mat card_image , int &inlinernumber, cv::BRISK *brisk_detector_, cv::Mat &database_image);
 
 cv::Mat DrawPts(cv::Mat &display_im, arma::fmat &pts, const cv::Scalar &pts_clr);

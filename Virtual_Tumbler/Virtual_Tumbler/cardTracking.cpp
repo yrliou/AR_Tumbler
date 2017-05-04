@@ -42,7 +42,7 @@ void cardAllFindhomography(cv::Mat &prevImage, cv::Mat &grayImage, cv::vector<cv
         previousPoints.push_back( keypoints_prev[ matches[i].queryIdx ].pt );
         currentPoints.push_back( keypoints_current[ matches[i].trainIdx ].pt );
     }
-    std::cout << "matches numbers " << matches.size() << std::endl;
+    //std::cout << "matches numbers " << matches.size() << std::endl;
     
     
     //************************ update corners
@@ -128,7 +128,7 @@ void trackingCorner(cv::Mat &colorImage, cv::vector<cv::vector<cv::Point>> &card
     
         cv::findContours(canny_edge, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_TC89_L1, cv::Point(0,0));
     
-        std::cout << "tracking contours " << contours.size() << std::endl;
+        //std::cout << "tracking contours " << contours.size() << std::endl;
     
         //*************     Remove unrelated contour
         // 0. remove too small area
@@ -149,7 +149,7 @@ void trackingCorner(cv::Mat &colorImage, cv::vector<cv::vector<cv::Point>> &card
         if (one_card_contours.size() == 1){
             // update the corner
             
-            std::cout << "Updating tracking corners" << std::endl;
+            //std::cout << "Updating tracking corners" << std::endl;
             
             cv::vector<cv::Point> one_card_corners;
             one_card_corners = getQuadpointOneCard(one_card_contours);
