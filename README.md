@@ -7,18 +7,16 @@ Kung-Hsien (Sam) Yu, YenJu (Jocelyn) Liu
 
 ## **Summary**
 
-In this project, we will implement a virtual rendered tumbler which can interact with people in iPad Air 2. The interaction means people can push the toy virtually, and the extent of wobbling depends on the forces. This is a proof-of-concept application, because the tumbler can be easily replaced by other objects, and the interactions can be different based on applications. We choose the tumbler due to its fun and comforting characteristic.
-
+In this project, we would like to implement a virtual rendered tumbler which can interact with people in iPad Air 2. In our first edition, we have built a prototype of Virtual Tumbler which can detect card corners, track card corners, and project virtual objects onto the cards in real time on iPad Air 2, which can serve as fundamental components for rendering augmented reality virtual tumblers and interacting with it in the future.
 
 ## **Background**
 
-Due to the real-time characteristic, it is important to run it as fast as possible. Therefore, we will leverage OpenGl ES whenever it is possible, and make a good use of computational components (CPU and GPU) at all times. Because the virtual rendering requires an accurate estimate of the device’s location, in addition to the high-speed camera, the internal sensors like Gyro sensors can be used to make the pose estimator more robust.
-
+OpenCV and Armadillo libraries are used for finding card corners, performing edge detections, obtaining homography matrices, resizing images, matrix operations, and so on.
 
 ## **The Challenge**
 
-In AR applications, it poses many difficult problems, and can’t be easily solved by OpenCV library. The challenges include rendering objects on an certain position, tracking objects that moves due to relative motions between the camera and objects, implementing a robust pose estimator, and estimating external forces on the objects. To achieve a robust and high FPS application, we need to modify novel CV algorithms, and combine them in an elegant way.
-
+Nowdays, implementing a virtual augmentation in the mobile devices is still a challenging task, since it needs to consider the power issue, hardware limitations, and real-time requirement.
+During implementing the first prototype of our project, we also encountered challenges such as how to effectivly detect cards in a frame, and tracking those card corners efficiently.
 
 ## **Goals & Deliverables**
 
