@@ -7,7 +7,7 @@ Kung-Hsien (Sam) Yu, YenJu (Jocelyn) Liu
 
 ## **Summary**
 
-In this project, we would like to implement a virtual rendered tumbler which can interact with people in iPad Air 2. In our first edition, we have built a prototype of Virtual Tumbler which can detect card corners, track card corners, and project virtual objects onto the cards in real time on iPad Air 2, which can serve as fundamental components for rendering augmented reality virtual tumblers and interacting with it in the future.
+In this project, we would like to implement a virtual rendered tumbler which can interact with people in iPad Air 2. In our first edition, we have built a prototype of Virtual Tumbler which can detect card corners, track card corners, and project virtual objects onto the cards in real time on iPad Air 2, which can serve as fundamental components for rendering augmented reality virtual tumblers and interacting with them in the future.
 
 ## **Background**
 
