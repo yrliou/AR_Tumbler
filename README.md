@@ -22,22 +22,23 @@ During implementing the first prototype of our project, we also encountered chal
 
 **Plan to achieve**
 
-Virtually rendering the tumbler, and creating wobble effects based on estimated external forces
+Projecting virtual objects on cards, and the user can move the camera or
+cards, but the objects are still on the correct positions.
 
 **Hope to achieve**
-
-1. Rendering the same virtual tumbler on multiple devices
-2. cooperate with internal sensors to achieve a robust AR applications
+1. Virtually rendering the tumbler, and creating wobble effects based on
+   estimated external forces
+2. Rendering the same virtual tumbler on multiple devices
+3. Cooperating with internal sensors to achieve a robust AR application
 
 **Evaluation**
 
-Since there is no ground truth, it is hard to quantize the performance. Luckily, our performance can be easily judged by human eyes, and we will have a time portfolio on each task like tracking objects, and pose estimator to show how well we can do when optimizing tasks.
-
+Since there is no ground truth, it is hard to quantize the performance. Luckily, our performance can be easily judged by human eyes, and we will have a time portfolio on each task like tracking objects, and card detection to show how well we can do when optimizing tasks.
 
 ## **Schedule**
-- 3/27-4/02 Create the 3D model of virtual tumbler and implement basic UI
-- 4/03-4/09 Virtual rendering of tumbler
-- 4/10-4/16  Identify pose and position of extra forces
-- 4/17-4/23  Generate corresponding extent effect on the virtual tumbler
+- 3/27-4/02 Implement basic UI and learn to use different libraries like OpenCV, Armadillo, and GPUImage
+- 4/03-4/09 Card detection and virtual rendering of tumbler
+- 4/10-4/16 Card detection and tracking
+- 4/17-4/23 Card identification and virtual augmentation
 - 4/24-4/30 Testing and Final Tuning
-- 5/01-5/04  Demo Preparation
+- 5/01-5/04 Demo Preparation
